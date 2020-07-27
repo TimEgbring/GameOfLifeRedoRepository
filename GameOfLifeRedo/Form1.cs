@@ -18,6 +18,8 @@ namespace GameOfLifeRedo
         Graphics g = null;
         bool isrunning = false;
         byte[] bytegrid;
+        byte[] bytegrid_new;
+        bool[] bytegrid_haschanged;
         Rectangle[] rect_grid;
 
         static int top_left_x, top_left_y;
@@ -34,13 +36,13 @@ namespace GameOfLifeRedo
         {
             InitializeComponent();
             InitVariables();
-
+            AdjustWinFrame();
             g = GridColorFlowPanel.CreateGraphics();
             
-            
-            
-           
-            
+
+
+
+
 
         }
 
@@ -73,25 +75,48 @@ namespace GameOfLifeRedo
         {
             top_left_x = GridColorFlowPanel.Location.X;
             top_left_y = GridColorFlowPanel.Location.Y;
-            bottom_right_x = top_left_x + GridColorFlowPanel.Width;
-            bottom_right_y = top_left_y + GridColorFlowPanel.Height - PanelBottom.Height;
-            cell_count_x = (bottom_right_x - top_left_x) / sizeofcell;
-            cell_count_x -= cell_count_x / sizeofcell ;  
-            cell_count_y = (bottom_right_y - top_left_y) / sizeofcell;
-            cell_count_y -= cell_count_y / sizeofcell;
-            rect_grid = new Rectangle[cell_count_y* cell_count_x];
+            int tmp_bottom_right_x = top_left_x + GridColorFlowPanel.Width;
+            int tmp_bottom_right_y = top_left_y + GridColorFlowPanel.Height - PanelBottom.Height;
+            cell_count_x = (tmp_bottom_right_x - top_left_x -1) / (sizeofcell+1);
+            
+            cell_count_y = (tmp_bottom_right_y - top_left_y -1) / (sizeofcell+1);
+            bottom_right_x = 1 + (sizeofcell + 1) * cell_count_x;
+            bottom_right_y = 1 + (sizeofcell + 1) * cell_count_y;
+            
+            rect_grid = new Rectangle[cell_count_y * cell_count_x];
             for(int i = 0; i < cell_count_y; i++)
             {
                 for(int j = 0; j< cell_count_x; j++)
                 {
-                    rect_grid[cell_count_x *i + j].X = top_left_x + j * 15 + j;
-                    rect_grid[cell_count_x * i + j].Y = top_left_y + i * 15 + i;
-                    rect_grid[cell_count_x * i + j].Size = new Size(15,15);
-                   
+                    rect_grid[cell_count_x *i + j].X = top_left_x + j * 15 + j+1;
+                    rect_grid[cell_count_x * i + j].Y = top_left_y + i * 15 + i+1;
+                    rect_grid[cell_count_x * i + j].Size = new Size(sizeofcell,sizeofcell);
                 }
             }
         }
-       
+        //private void RecalcVariables() //For later use to keep gridinformation like Rectangles etc
+        //{
+        //    top_left_x = GridColorFlowPanel.Location.X;
+        //    top_left_y = GridColorFlowPanel.Location.Y;
+        //    int tmp_bottom_right_x = top_left_x + GridColorFlowPanel.Width;
+        //    int tmp_bottom_right_y = top_left_y + GridColorFlowPanel.Height - PanelBottom.Height;
+        //    cell_count_x = (tmp_bottom_right_x - top_left_x - 1) / (sizeofcell + 1);
+
+        //    cell_count_y = (tmp_bottom_right_y - top_left_y - 1) / (sizeofcell + 1);
+        //    bottom_right_x = 1 + (sizeofcell + 1) * cell_count_x ;
+        //    bottom_right_y = 1 + (sizeofcell + 1) * cell_count_y ;
+
+        //    rect_grid = new Rectangle[cell_count_y * cell_count_x];
+        //    for (int i = 0; i < cell_count_y; i++)
+        //    {
+        //        for (int j = 0; j < cell_count_x; j++)
+        //        {
+        //            rect_grid[cell_count_x * i + j].X = top_left_x + j * 15 + j + 1;
+        //            rect_grid[cell_count_x * i + j].Y = top_left_y + i * 15 + i + 1;
+        //            rect_grid[cell_count_x * i + j].Size = new Size(sizeofcell, sizeofcell);
+        //        }
+        //    }
+        //}
 
         private void GridColorFlowPanel_Paint(object sender, PaintEventArgs e)
         {
@@ -100,25 +125,34 @@ namespace GameOfLifeRedo
             g.FillRectangles(new SolidBrush(Color.Black), rect_grid);
             // e.Graphics.TranslateTransform(GridColorFlowPanel.AutoScrollPosition.X, GridColorFlowPanel.AutoScrollPosition.Y);
         }
-        
+
         private void InitLineGrid()
         {
             for(int i = 0; i < cell_count_x; i++)
             {
-                g.DrawLine(new Pen(Color.Red), rect_grid[i].X, top_left_y, rect_grid[i].X, bottom_right_y);
+                g.DrawLine(new Pen(Color.Red), rect_grid[i].X-1, top_left_y, rect_grid[i].X-1, bottom_right_y-1);
 
             }
-            for(int i = 0; i < cell_count_y; i++)
+            g.DrawLine(new Pen(Color.Red), rect_grid[cell_count_x-1].X +16-1, top_left_y, rect_grid[cell_count_x-1].X +16-1, bottom_right_y-1);
+            for (int i = 0; i < cell_count_y; i++)
             {
-                g.DrawLine(new Pen(Color.Red), top_left_x, rect_grid[i*cell_count_x].Y, bottom_right_x, rect_grid[i * cell_count_x].Y);
+                g.DrawLine(new Pen(Color.Red), top_left_x, rect_grid[i*cell_count_x].Y-1, bottom_right_x-1, rect_grid[i * cell_count_x].Y-1);
             }
+            g.DrawLine(new Pen(Color.Red), top_left_x, rect_grid[cell_count_y * cell_count_x-1].Y +16  - 1, bottom_right_x - 1, rect_grid[cell_count_y * cell_count_x-1].Y +16 - 1);
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            InitVariables();
+            //InitVariables();
+            AdjustWinFrame();
 
-            GridColorFlowPanel.Refresh();
+
+        }
+        private void AdjustWinFrame()
+        {
+            
+            this.Size = new Size(bottom_right_x+16, bottom_right_y + PanelBottom.Height + 39);
+
         }
     }
 }
