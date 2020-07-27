@@ -38,7 +38,7 @@ namespace GameOfLifeRedo
         
 
         static int cell_count_x, cell_count_y;
-        const int sizeofcell = 13;
+        const int sizeofcell = 4;
         
 
         enum general_state { initializing };
@@ -48,6 +48,10 @@ namespace GameOfLifeRedo
             InitializeComponent();
 
             InitVariables();
+            InitNeighbors();
+
+            
+
             AdjustWinFrame();
             g = GridColorFlowPanel.CreateGraphics();
             
@@ -60,12 +64,12 @@ namespace GameOfLifeRedo
 
         private void GenerationTimer_Tick(object sender, EventArgs e)
         {
-
+            RuleSetModifiedShelter();
         }
 
         private void Start_Button_Click(object sender, EventArgs e)
         {
-            if (isrunning)
+            if (!isrunning)
                 StartGame();
             else
                 PauseGame();
@@ -98,13 +102,23 @@ namespace GameOfLifeRedo
             rect_grid = new Rectangle[cell_count_y * cell_count_x];
             for(int i = 0; i < cell_count_y; i++)
             {
-                for(int j = 0; j< cell_count_x; j++)
+                for(int j = 0; j < cell_count_x; j++)
                 {
                     rect_grid[cell_count_x * i + j].X = top_left_x + j * sizeofcell + j + 1;
                     rect_grid[cell_count_x * i + j].Y = top_left_y + i * sizeofcell + i + 1;
                     rect_grid[cell_count_x * i + j].Size = new Size(sizeofcell,sizeofcell);
                 }
             }
+            bytegrid = new byte[cell_count_x * cell_count_y];
+
+            
+            isalive = new bool[cell_count_x * cell_count_y]; 
+            hasaliveneighbors = new bool[cell_count_x * cell_count_y];
+            aliveneighbors_count = new byte[cell_count_x * cell_count_y];
+            bytegrid_new = new byte[cell_count_x * cell_count_y];
+            bytegrid_haschanged = new bool[cell_count_x * cell_count_y];
+            neighbors = new int[cell_count_x * cell_count_y,8];
+            neighbors_gradient_sum=new byte[cell_count_x * cell_count_y];
         }
         private void InitNeighbors()
         {
@@ -159,7 +173,7 @@ namespace GameOfLifeRedo
                 }
                 else neighbors[i, (int)Compass.NE] = i - cell_count_x + 1;
 
-                if ((i + 1) % cell_count_x == 0)        //Handles SouthEast
+                if (cell_count_x %(i + 1) == 0)        //Handles SouthEast
                 {
                     if (i == cell_count_x*cell_count_y -1)
                     {
@@ -169,7 +183,7 @@ namespace GameOfLifeRedo
                 }
                 else if (i >= cell_count_x * cell_count_y - cell_count_x)
                 {
-                    neighbors[i, (int)Compass.SE] = i - cell_count_x * cell_count_y - cell_count_x + 1;
+                    neighbors[i, (int)Compass.SE] = i - cell_count_x * cell_count_y  + 1;
                 }
                 else neighbors[i, (int)Compass.SE] = i + cell_count_x + 1;
 
@@ -276,7 +290,7 @@ namespace GameOfLifeRedo
             Rectangle[] grey2 = new Rectangle[sumgrey2];
             Rectangle[] grey3 = new Rectangle[sumgrey3];
             Rectangle[] black = new Rectangle[sumblack];
-            for (int i = 0; i < sumwhite+sumgrey1+sumgrey2+sumgrey3+sumblack; i++)
+            for (int i = 0; i < cell_count_x * cell_count_y; i++)
             {
                 if (bytegrid_haschanged[i])
                 {
@@ -292,11 +306,16 @@ namespace GameOfLifeRedo
                         black[blackcount++] = rect_grid[i];
                 }
             }
-            g.FillRectangles(dead_white, white);
-            g.FillRectangles(mygrey1, grey1);
-            g.FillRectangles(mygrey2, grey2);
-            g.FillRectangles(mygrey3, grey3);
-            g.FillRectangles(full_black, black);
+            if(white.Length != 0)
+                g.FillRectangles(dead_white, white);
+            if (grey1.Length != 0)
+                g.FillRectangles(mygrey1, grey1);
+            if (grey2.Length != 0)
+                g.FillRectangles(mygrey2, grey2);
+            if (grey3.Length != 0)
+                g.FillRectangles(mygrey3, grey3);
+            if (black.Length != 0)
+                g.FillRectangles(full_black, black);
         }
 
 
@@ -329,7 +348,7 @@ namespace GameOfLifeRedo
         {
             
             InitLineGrid();
-            g.FillRectangles(new SolidBrush(Color.Black), rect_grid);
+            
             // e.Graphics.TranslateTransform(GridColorFlowPanel.AutoScrollPosition.X, GridColorFlowPanel.AutoScrollPosition.Y);
         }
 
@@ -361,10 +380,16 @@ namespace GameOfLifeRedo
             this.Size = new Size(bottom_right_x+16, bottom_right_y + PanelBottom.Height + 39); //Offset from Form1 Size and InnerForm1 Size
 
         }
+
+        private void FullSymmetric_Button_Click(object sender, EventArgs e)
+        {
+            GenerateFullSymmetric();
+        }
+
         private void RuleSetModifiedShelter()
         {
 
-            for (int i = 0; i < 900; i++)
+            for (int i = 0; i < cell_count_x*cell_count_y; i++)
             {
                 if (hasaliveneighbors[i] || isalive[i])
                 {       //Calculates Bytegrid_new
@@ -400,7 +425,7 @@ namespace GameOfLifeRedo
                 }
             }
             BytegridChangeAction();
-            for (int i = 0; i < 900; i++)
+            for (int i = 0; i < cell_count_x*cell_count_y; i++)
             {
                 bytegrid[i] = bytegrid_new[i];
             }
@@ -409,7 +434,7 @@ namespace GameOfLifeRedo
 
         private void BytegridChangeAction()
         {
-            for (int i = 0; i < 900; i++)
+            for (int i = 0; i < cell_count_x * cell_count_y; i++)
             {
                 if (bytegrid_new[i] < bytegrid[i])
                 {
@@ -441,145 +466,161 @@ namespace GameOfLifeRedo
                 }
             }
         }
-        private void GenerateFullSymmetric()
+        private void GenerateFullSymmetric() //Implement parity difference (middle line or 2 middle lines?)
         {
-            byte range = 12;
+            byte range = 45;
             Random rnd = new Random();
-
+            if(range >cell_count_x || range > cell_count_y)
+            {
+                MessageBox.Show("Range ist zu groß");
+                return;
+            }
             for (int i = 0; i < range; i++)
             {
                 for (int j = 0; j < range - i; j++)
                 {
 
+                    if(cell_count_x % 2 != cell_count_y % 2)
+                    {
+                        MessageBox.Show("True Symmetric ist verschoben");
+                        
+                    }
+                    if (cell_count_x % 2 == 0 && cell_count_y % 2 == 0)
+                    {
+                        int point1 = (cell_count_y / 2 * cell_count_x - cell_count_x/2);
+                        int point2 = point1 + 1;
+                        int point3 = point1 + cell_count_x;
+                        int point4 = point3 + 1;
 
-                    int n1 = 435 - (30 + 1) * range + 30 * i + j + i + 30;
-                    int n12 = n1 + (30 - 1) * j;
-                    int n2 = 436 - (30 - 1) * range + 30 * i - j - i - 2 + 30;
-                    int n22 = n2 + (30 + 1) * j;
-                    int n3 = 465 + (30 - 1) * range - 30 * i + j + i - 30;
-                    int n32 = n3 - (30 + 1) * j;
-                    int n4 = 466 + (30 + 1) * range - 30 * i - j - i - 2 - 30;
-                    int n42 = n4 - (30 - 1) * j;
+
+                        int n1 = point1 - (cell_count_x + 1) * range + cell_count_x * i + j + i + cell_count_x;
+                        int n12 = n1 + (cell_count_x - 1) * j;
+                        int n2 = point2 - (cell_count_x - 1) * range + cell_count_x * i - j - i - 2 + cell_count_x;
+                        int n22 = n2 + (cell_count_x + 1) * j;
+                        int n3 = point3 + (cell_count_x - 1) * range - cell_count_x * i + j + i - cell_count_x;
+                        int n32 = n3 - (cell_count_x + 1) * j;
+                        int n4 = point4 + (cell_count_x + 1) * range - cell_count_x * i - j - i - 2 - cell_count_x;
+                        int n42 = n4 - (cell_count_x - 1) * j;
                         switch (rnd.Next(0, 5))
                         {
                             case 0:
-                                buttons[n1].BackColor = dead_white;
+                                g.FillRectangle(dead_white, rect_grid[n1]);
                                 bytegrid[n1] = 0;
                                 isalive[n1] = false;
 
-                                buttons[n2].BackColor = dead_white;
+                                g.FillRectangle(dead_white, rect_grid[n2]);
                                 bytegrid[n2] = 0;
                                 isalive[n2] = false;
 
-                                buttons[n3].BackColor = dead_white;
+                                g.FillRectangle(dead_white, rect_grid[n3]);
                                 bytegrid[n3] = 0;
                                 isalive[n3] = false;
 
-                                buttons[n4].BackColor = dead_white;
+                                g.FillRectangle(dead_white, rect_grid[n4]);
                                 bytegrid[n4] = 0;
                                 isalive[n4] = false;
 
-                                buttons[n12].BackColor = dead_white;
+                                g.FillRectangle(dead_white, rect_grid[n12]);
                                 bytegrid[n12] = 0;
                                 isalive[n12] = false;
 
-                                buttons[n22].BackColor = dead_white;
+                                g.FillRectangle(dead_white, rect_grid[n22]);
                                 bytegrid[n22] = 0;
                                 isalive[n22] = false;
 
-                                buttons[n32].BackColor = dead_white;
+                                g.FillRectangle(dead_white, rect_grid[n32]);
                                 bytegrid[n32] = 0;
                                 isalive[n32] = false;
 
-                                buttons[n42].BackColor = dead_white;
+                                g.FillRectangle(dead_white, rect_grid[n42]);
                                 bytegrid[n42] = 0;
                                 isalive[n42] = false;
 
                                 break;
                             case 1:
-                                buttons[n1].BackColor = mygrey1;
+                                g.FillRectangle(mygrey1, rect_grid[n1]);
                                 bytegrid[n1] = 1;
                                 AliveNeighborsIncBool(n1);
-                                IsAliveAndStatInc(n1);
+                                isalive[n1] = true;
                                 NeighborGradientSumInc(n1);
 
-                                buttons[n2].BackColor = mygrey1;
+                                g.FillRectangle(mygrey1, rect_grid[n2]);
                                 bytegrid[n2] = 1;
                                 AliveNeighborsIncBool(n2);
-                                IsAliveAndStatInc(n2);
+                                isalive[n2] = true;
                                 NeighborGradientSumInc(n2);
 
-                                buttons[n3].BackColor = mygrey1;
+                                g.FillRectangle(mygrey1, rect_grid[n3]);
                                 bytegrid[n3] = 1;
                                 AliveNeighborsIncBool(n3);
-                                IsAliveAndStatInc(n3);
+                                isalive[n3] = true;
                                 NeighborGradientSumInc(n3);
 
-                                buttons[n4].BackColor = mygrey1;
+                                g.FillRectangle(mygrey1, rect_grid[n4]);
                                 bytegrid[n4] = 1;
                                 AliveNeighborsIncBool(n4);
-                                IsAliveAndStatInc(n4);
+                                isalive[n4] = true;
                                 NeighborGradientSumInc(n4);
                                 if (n1 != n12)
                                 {
-                                    buttons[n12].BackColor = mygrey1;
+                                    g.FillRectangle(mygrey1, rect_grid[n12]);
                                     bytegrid[n12] = 1;
                                     AliveNeighborsIncBool(n12);
-                                    IsAliveAndStatInc(n12);
+                                    isalive[n12] = true;
                                     NeighborGradientSumInc(n12);
 
-                                    buttons[n22].BackColor = mygrey1;
+                                    g.FillRectangle(mygrey1, rect_grid[n22]);
                                     bytegrid[n22] = 1;
                                     AliveNeighborsIncBool(n22);
-                                    IsAliveAndStatInc(n22);
+                                    isalive[n22] = true;
                                     NeighborGradientSumInc(n22);
 
-                                    buttons[n32].BackColor = mygrey1;
+                                    g.FillRectangle(mygrey1, rect_grid[n32]);
                                     bytegrid[n32] = 1;
                                     AliveNeighborsIncBool(n32);
-                                    IsAliveAndStatInc(n32);
+                                    isalive[n32] = true;
                                     NeighborGradientSumInc(n32);
 
-                                    buttons[n42].BackColor = mygrey1;
+                                    g.FillRectangle(mygrey1, rect_grid[n42]);
                                     bytegrid[n42] = 1;
                                     AliveNeighborsIncBool(n42);
-                                    IsAliveAndStatInc(n42);
+                                    isalive[n42] = true;
                                     NeighborGradientSumInc(n42);
 
                                 }
                                 break;
                             case 2:
-                                buttons[n1].BackColor = mygrey2;
+                                g.FillRectangle(mygrey2, rect_grid[n1]);
                                 bytegrid[n1] = 2;
                                 AliveNeighborsIncBool(n1);
-                                IsAliveAndStatInc(n1);
+                                isalive[n1] = true;
                                 for (int k = 0; k < 2; k++)
                                 {
                                     NeighborGradientSumInc(n1);
                                 }
 
-                                buttons[n2].BackColor = mygrey2;
+                                g.FillRectangle(mygrey2, rect_grid[n2]);
                                 bytegrid[n2] = 2;
                                 AliveNeighborsIncBool(n2);
-                                IsAliveAndStatInc(n2);
+                                isalive[n2] = true;
                                 for (int k = 0; k < 2; k++)
                                 {
                                     NeighborGradientSumInc(n2);
                                 }
 
-                                buttons[n3].BackColor = mygrey2;
+                                g.FillRectangle(mygrey2, rect_grid[n3]);
                                 bytegrid[n3] = 2;
                                 AliveNeighborsIncBool(n3);
-                                IsAliveAndStatInc(n3);
+                                isalive[n3] = true;
                                 for (int k = 0; k < 2; k++)
                                 {
                                     NeighborGradientSumInc(n3);
                                 }
 
-                                buttons[n4].BackColor = mygrey2;
+                                g.FillRectangle(mygrey2, rect_grid[n4]);
                                 bytegrid[n4] = 2;
                                 AliveNeighborsIncBool(n4);
-                                IsAliveAndStatInc(n4);
+                                isalive[n4] = true;
                                 for (int k = 0; k < 2; k++)
                                 {
                                     NeighborGradientSumInc(n4);
@@ -587,37 +628,37 @@ namespace GameOfLifeRedo
 
                                 if (n1 != n12)
                                 {
-                                    buttons[n12].BackColor = mygrey2;
+                                    g.FillRectangle(mygrey2, rect_grid[n12]);
                                     bytegrid[n12] = 2;
                                     AliveNeighborsIncBool(n12);
-                                    IsAliveAndStatInc(n12);
+                                    isalive[n12] = true;
                                     for (int k = 0; k < 2; k++)
                                     {
                                         NeighborGradientSumInc(n12);
                                     }
 
-                                    buttons[n22].BackColor = mygrey2;
+                                    g.FillRectangle(mygrey2, rect_grid[n22]);
                                     bytegrid[n22] = 2;
                                     AliveNeighborsIncBool(n22);
-                                    IsAliveAndStatInc(n22);
+                                    isalive[n22] = true;
                                     for (int k = 0; k < 2; k++)
                                     {
                                         NeighborGradientSumInc(n22);
                                     }
 
-                                    buttons[n32].BackColor = mygrey2;
+                                    g.FillRectangle(mygrey2, rect_grid[n32]);
                                     bytegrid[n32] = 2;
                                     AliveNeighborsIncBool(n32);
-                                    IsAliveAndStatInc(n32);
+                                    isalive[n32] = true;
                                     for (int k = 0; k < 2; k++)
                                     {
                                         NeighborGradientSumInc(n32);
                                     }
 
-                                    buttons[n42].BackColor = mygrey2;
+                                    g.FillRectangle(mygrey2, rect_grid[n42]);
                                     bytegrid[n42] = 2;
                                     AliveNeighborsIncBool(n42);
-                                    IsAliveAndStatInc(n42);
+                                    isalive[n42] = true;
                                     for (int k = 0; k < 2; k++)
                                     {
                                         NeighborGradientSumInc(n42);
@@ -625,82 +666,81 @@ namespace GameOfLifeRedo
                                 }
                                 break;
                             case 3:
-                                buttons[n1].BackColor = mygrey3;
+                                g.FillRectangle(mygrey3, rect_grid[n1]);
                                 bytegrid[n1] = 3;
                                 AliveNeighborsIncBool(n1);
-                                IsAliveAndStatInc(n1);
-                                DesignerNeighborsInc(n1); //Temp if u want
+                                isalive[n1] = true;
+
                                 for (int k = 0; k < 3; k++)
                                 {
                                     NeighborGradientSumInc(n1);
                                 }
 
-                                buttons[n2].BackColor = mygrey3;
+                                g.FillRectangle(mygrey3, rect_grid[n2]);
                                 bytegrid[n2] = 3;
                                 AliveNeighborsIncBool(n2);
-                                IsAliveAndStatInc(n2);
-                                DesignerNeighborsInc(n2); //same
+                                isalive[n2] = true;
+
                                 for (int k = 0; k < 3; k++)
                                 {
                                     NeighborGradientSumInc(n2);
                                 }
 
-                                buttons[n3].BackColor = mygrey3;
+                                g.FillRectangle(mygrey3, rect_grid[n3]);
                                 bytegrid[n3] = 3;
                                 AliveNeighborsIncBool(n3);
-                                IsAliveAndStatInc(n3);
-                                DesignerNeighborsInc(n3); //Temp if u want
+                                isalive[n3] = true;
+
                                 for (int k = 0; k < 3; k++)
                                 {
                                     NeighborGradientSumInc(n3);
                                 }
 
-                                buttons[n4].BackColor = mygrey3;
+                                g.FillRectangle(mygrey3, rect_grid[n4]);
                                 bytegrid[n4] = 3;
                                 AliveNeighborsIncBool(n4);
-                                IsAliveAndStatInc(n4);
-                                DesignerNeighborsInc(n4); //same
+                                isalive[n4] = true;
+
                                 for (int k = 0; k < 3; k++)
                                 {
                                     NeighborGradientSumInc(n4);
                                 }
                                 if (n1 != n12)
                                 {
-                                    buttons[n12].BackColor = mygrey3;
+                                    g.FillRectangle(mygrey3, rect_grid[n12]);
                                     bytegrid[n12] = 3;
                                     AliveNeighborsIncBool(n12);
-                                    IsAliveAndStatInc(n12);
-                                    DesignerNeighborsInc(n12); //Temp if u want
+                                    isalive[n12] = true;
+
                                     for (int k = 0; k < 3; k++)
                                     {
                                         NeighborGradientSumInc(n12);
                                     }
 
-                                    buttons[n22].BackColor = mygrey3;
+                                    g.FillRectangle(mygrey3, rect_grid[n22]);
                                     bytegrid[n22] = 3;
                                     AliveNeighborsIncBool(n22);
-                                    IsAliveAndStatInc(n22);
-                                    DesignerNeighborsInc(n22); //same
+                                    isalive[n22] = true;
+
                                     for (int k = 0; k < 3; k++)
                                     {
                                         NeighborGradientSumInc(n22);
                                     }
 
-                                    buttons[n32].BackColor = mygrey3;
+                                    g.FillRectangle(mygrey3, rect_grid[n32]);
                                     bytegrid[n32] = 3;
                                     AliveNeighborsIncBool(n32);
-                                    IsAliveAndStatInc(n32);
-                                    DesignerNeighborsInc(n32); //Temp if u want
+                                    isalive[n32] = true;
+
                                     for (int k = 0; k < 3; k++)
                                     {
                                         NeighborGradientSumInc(n32);
                                     }
 
-                                    buttons[n42].BackColor = mygrey3;
+                                    g.FillRectangle(mygrey3, rect_grid[n42]);
                                     bytegrid[n42] = 3;
                                     AliveNeighborsIncBool(n42);
-                                    IsAliveAndStatInc(n42);
-                                    DesignerNeighborsInc(n42); //same
+                                    isalive[n42] = true;
                                     for (int k = 0; k < 3; k++)
                                     {
                                         NeighborGradientSumInc(n42);
@@ -708,82 +748,82 @@ namespace GameOfLifeRedo
                                 }
                                 break;
                             case 4:
-                                buttons[n1].BackColor = full_black;
+                                g.FillRectangle(full_black, rect_grid[n1]);
                                 bytegrid[n1] = 4;
-                                DesignerNeighborsInc(n1);
+                               
                                 AliveNeighborsIncBool(n1);
-                                IsAliveAndStatInc(n1);
+                                isalive[n1] = true;
                                 for (int k = 0; k < 4; k++)
                                 {
                                     NeighborGradientSumInc(n1);
                                 }
 
-                                buttons[n2].BackColor = full_black;
+                                g.FillRectangle(full_black, rect_grid[n2]);
                                 bytegrid[n2] = 4;
-                                DesignerNeighborsInc(n2);
+                                
                                 AliveNeighborsIncBool(n2);
-                                IsAliveAndStatInc(n2);
+                                isalive[n2] = true;
                                 for (int k = 0; k < 4; k++)
                                 {
                                     NeighborGradientSumInc(n2);
                                 }
 
-                                buttons[n3].BackColor = full_black;
+                                g.FillRectangle(full_black, rect_grid[n3]);
                                 bytegrid[n3] = 4;
-                                DesignerNeighborsInc(n3);
+                                
                                 AliveNeighborsIncBool(n3);
-                                IsAliveAndStatInc(n3);
+                                isalive[n3] = true;
                                 for (int k = 0; k < 4; k++)
                                 {
                                     NeighborGradientSumInc(n3);
                                 }
 
-                                buttons[n4].BackColor = full_black;
+                                g.FillRectangle(full_black, rect_grid[n4]);
                                 bytegrid[n4] = 4;
-                                DesignerNeighborsInc(n4);
+                                
                                 AliveNeighborsIncBool(n4);
-                                IsAliveAndStatInc(n4);
+                                isalive[n4] = true;
                                 for (int k = 0; k < 4; k++)
                                 {
                                     NeighborGradientSumInc(n4);
                                 }
                                 if (n1 != n12)
                                 {
-                                    buttons[n12].BackColor = full_black;
+                                    g.FillRectangle(full_black, rect_grid[n12]);
                                     bytegrid[n12] = 4;
-                                    DesignerNeighborsInc(n12);
+                                   
                                     AliveNeighborsIncBool(n12);
-                                    IsAliveAndStatInc(n12);
+                                    isalive[n12] = true;
                                     for (int k = 0; k < 4; k++)
                                     {
                                         NeighborGradientSumInc(n12);
                                     }
 
-                                    buttons[n22].BackColor = full_black;
+                                    g.FillRectangle(full_black, rect_grid[n22]);
                                     bytegrid[n22] = 4;
-                                    DesignerNeighborsInc(n22);
+                                    
                                     AliveNeighborsIncBool(n22);
-                                    IsAliveAndStatInc(n22);
+                                    isalive[n22] = true;
                                     for (int k = 0; k < 4; k++)
                                     {
                                         NeighborGradientSumInc(n22);
                                     }
 
-                                    buttons[n32].BackColor = full_black;
+                                    g.FillRectangle(full_black, rect_grid[n32]);
                                     bytegrid[n32] = 4;
-                                    DesignerNeighborsInc(n32);
+                                    
                                     AliveNeighborsIncBool(n32);
-                                    IsAliveAndStatInc(n32);
+                                    isalive[n32] = true;
                                     for (int k = 0; k < 4; k++)
                                     {
                                         NeighborGradientSumInc(n32);
                                     }
 
-                                    buttons[n42].BackColor = full_black;
+                                    g.FillRectangle(full_black, rect_grid[n42]);
                                     bytegrid[n42] = 4;
-                                    DesignerNeighborsInc(n42);
+                                   
                                     AliveNeighborsIncBool(n42);
-                                    IsAliveAndStatInc(n42);
+                                    isalive[n42] = true;
                                     for (int k = 0; k < 4; k++)
                                     {
                                         NeighborGradientSumInc(n42);
@@ -794,8 +834,8 @@ namespace GameOfLifeRedo
                             default:
                                 break;
                         }
-                    
-                    
+
+                    }
                 }
 
             }
