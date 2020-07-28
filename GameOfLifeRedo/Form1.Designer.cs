@@ -31,10 +31,11 @@
             this.components = new System.ComponentModel.Container();
             this.GridColorFlowPanel = new System.Windows.Forms.FlowLayoutPanel();
             this.PanelBottom = new System.Windows.Forms.Panel();
+            this.FullSymmetric_Button = new System.Windows.Forms.Button();
             this.Start_Button = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
             this.GenerationTimer = new System.Windows.Forms.Timer(this.components);
-            this.FullSymmetric_Button = new System.Windows.Forms.Button();
+            this.ManualTick_Button = new System.Windows.Forms.Button();
             this.PanelBottom.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -51,6 +52,7 @@
             // PanelBottom
             // 
             this.PanelBottom.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.PanelBottom.Controls.Add(this.ManualTick_Button);
             this.PanelBottom.Controls.Add(this.FullSymmetric_Button);
             this.PanelBottom.Controls.Add(this.Start_Button);
             this.PanelBottom.Controls.Add(this.button1);
@@ -59,6 +61,16 @@
             this.PanelBottom.Name = "PanelBottom";
             this.PanelBottom.Size = new System.Drawing.Size(1105, 107);
             this.PanelBottom.TabIndex = 1;
+            // 
+            // FullSymmetric_Button
+            // 
+            this.FullSymmetric_Button.Location = new System.Drawing.Point(912, 41);
+            this.FullSymmetric_Button.Name = "FullSymmetric_Button";
+            this.FullSymmetric_Button.Size = new System.Drawing.Size(117, 23);
+            this.FullSymmetric_Button.TabIndex = 2;
+            this.FullSymmetric_Button.Text = "Full Symmetric";
+            this.FullSymmetric_Button.UseVisualStyleBackColor = true;
+            this.FullSymmetric_Button.Click += new System.EventHandler(this.FullSymmetric_Button_Click);
             // 
             // Start_Button
             // 
@@ -85,15 +97,15 @@
             this.GenerationTimer.Interval = 10;
             this.GenerationTimer.Tick += new System.EventHandler(this.GenerationTimer_Tick);
             // 
-            // FullSymmetric_Button
+            // ManualTick_Button
             // 
-            this.FullSymmetric_Button.Location = new System.Drawing.Point(912, 41);
-            this.FullSymmetric_Button.Name = "FullSymmetric_Button";
-            this.FullSymmetric_Button.Size = new System.Drawing.Size(117, 23);
-            this.FullSymmetric_Button.TabIndex = 2;
-            this.FullSymmetric_Button.Text = "Full Symmetric";
-            this.FullSymmetric_Button.UseVisualStyleBackColor = true;
-            this.FullSymmetric_Button.Click += new System.EventHandler(this.FullSymmetric_Button_Click);
+            this.ManualTick_Button.Location = new System.Drawing.Point(912, 11);
+            this.ManualTick_Button.Name = "ManualTick_Button";
+            this.ManualTick_Button.Size = new System.Drawing.Size(117, 23);
+            this.ManualTick_Button.TabIndex = 3;
+            this.ManualTick_Button.Text = "Manual Tick";
+            this.ManualTick_Button.UseVisualStyleBackColor = true;
+            this.ManualTick_Button.Click += new System.EventHandler(this.ManualTick_Button_Click);
             // 
             // Form1
             // 
@@ -117,6 +129,7 @@
         private System.Windows.Forms.Timer GenerationTimer;
         private System.Windows.Forms.Button Start_Button;
         private System.Windows.Forms.Button FullSymmetric_Button;
+        private System.Windows.Forms.Button ManualTick_Button;
     }
 }
 

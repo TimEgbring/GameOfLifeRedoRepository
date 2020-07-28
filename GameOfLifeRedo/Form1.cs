@@ -38,7 +38,7 @@ namespace GameOfLifeRedo
         
 
         static int cell_count_x, cell_count_y;
-        const int sizeofcell = 4;
+        const int sizeofcell = 20;
         
 
         enum general_state { initializing };
@@ -69,6 +69,10 @@ namespace GameOfLifeRedo
 
         private void Start_Button_Click(object sender, EventArgs e)
         {
+            for (int i = 0; i < 900; i++)
+            {
+                bytegrid_new[i] = bytegrid[i];
+            }
             if (!isrunning)
                 StartGame();
             else
@@ -85,6 +89,7 @@ namespace GameOfLifeRedo
         private void PauseGame()
         {
             Start_Button.Text = "Start";
+            isrunning = false;
             GenerationTimer.Stop();
         }
         private void InitVariables()
@@ -165,7 +170,7 @@ namespace GameOfLifeRedo
                     {
                         neighbors[i, (int)Compass.NE] = cell_count_x * cell_count_y - cell_count_x;
                     }
-                    else neighbors[i, (int)Compass.NE] = i - cell_count_x - cell_count_x-1;
+                    else neighbors[i, (int)Compass.NE] = i - cell_count_x - cell_count_x+1;
                 }
                 else if (i < cell_count_x)
                 {
@@ -173,7 +178,7 @@ namespace GameOfLifeRedo
                 }
                 else neighbors[i, (int)Compass.NE] = i - cell_count_x + 1;
 
-                if (cell_count_x %(i + 1) == 0)        //Handles SouthEast
+                if ((i + 1) % cell_count_x  == 0)        //Handles SouthEast
                 {
                     if (i == cell_count_x*cell_count_y -1)
                     {
@@ -183,7 +188,7 @@ namespace GameOfLifeRedo
                 }
                 else if (i >= cell_count_x * cell_count_y - cell_count_x)
                 {
-                    neighbors[i, (int)Compass.SE] = i - cell_count_x * cell_count_y  + 1;
+                    neighbors[i, (int)Compass.SE] = i - cell_count_x * cell_count_y + cell_count_x  + 1;
                 }
                 else neighbors[i, (int)Compass.SE] = i + cell_count_x + 1;
 
@@ -197,7 +202,7 @@ namespace GameOfLifeRedo
                 }
                 else if (i >= cell_count_x * cell_count_y - cell_count_x)
                 {
-                    neighbors[i, (int)Compass.SW] = i - cell_count_x * cell_count_y - cell_count_x - 1;
+                    neighbors[i, (int)Compass.SW] = i - cell_count_x * cell_count_y + cell_count_x - 1;
                 }
                 else neighbors[i, (int)Compass.SW] = i + cell_count_x - 1;
 
@@ -233,7 +238,7 @@ namespace GameOfLifeRedo
 
                 aliveneighbors_count[neighbors[buttonnumber, i]]--;
 
-                hasaliveneighbors[neighbors[buttonnumber, i]] = !(aliveneighbors_count[neighbors[buttonnumber, i]] == 0);
+                hasaliveneighbors[neighbors[buttonnumber, i]] = (aliveneighbors_count[neighbors[buttonnumber, i]] != 0);
             }
         }
         private void NeighborGradientSumInc(int buttonnumber)
@@ -400,7 +405,6 @@ namespace GameOfLifeRedo
                     }
                     else if (neighbors_gradient_sum[i] < 8 || neighbors_gradient_sum[i] > 12) //Too small or too big
                     {
-
                         if (isalive[i])
                         {
 
@@ -416,7 +420,6 @@ namespace GameOfLifeRedo
 
                         }
 
-                        isalive[i] = true;
                     }
                     else //enough to survive
                     {
@@ -432,6 +435,12 @@ namespace GameOfLifeRedo
             UpdateColorAll();
         }
 
+        private void ManualTick_Button_Click(object sender, EventArgs e)
+        {
+            
+            RuleSetModifiedShelter();
+        }
+
         private void BytegridChangeAction()
         {
             for (int i = 0; i < cell_count_x * cell_count_y; i++)
@@ -440,9 +449,10 @@ namespace GameOfLifeRedo
                 {
                     bytegrid_haschanged[i] = true;
                     NeighborGradientSumDec(i);
-
+                    
                     if (bytegrid_new[i] == 0)
                     {
+                        AliveNeighborsDecBool(i);
                         isalive[i] = false;
                     }
                     
@@ -466,25 +476,27 @@ namespace GameOfLifeRedo
                 }
             }
         }
+        
         private void GenerateFullSymmetric() //Implement parity difference (middle line or 2 middle lines?)
         {
-            byte range = 45;
+            byte range = 8;
             Random rnd = new Random();
-            if(range >cell_count_x || range > cell_count_y)
+            if (range > cell_count_x || range > cell_count_y)
             {
                 MessageBox.Show("Range ist zu groß");
                 return;
+            }
+            if (cell_count_x % 2 != cell_count_y % 2)
+            {
+               // MessageBox.Show("True Symmetric ist verschoben");
+
             }
             for (int i = 0; i < range; i++)
             {
                 for (int j = 0; j < range - i; j++)
                 {
 
-                    if(cell_count_x % 2 != cell_count_y % 2)
-                    {
-                        MessageBox.Show("True Symmetric ist verschoben");
-                        
-                    }
+                    
                     if (cell_count_x % 2 == 0 && cell_count_y % 2 == 0)
                     {
                         int point1 = (cell_count_y / 2 * cell_count_x - cell_count_x/2);
