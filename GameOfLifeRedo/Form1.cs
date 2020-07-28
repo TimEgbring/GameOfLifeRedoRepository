@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,6 +32,7 @@ namespace GameOfLifeRedo
         int[,] neighbors;
         byte[] neighbors_gradient_sum;
         Rectangle[] rect_grid;
+        int generationcounter;
         enum Compass { N, E, S, W, NE, SE, SW, NW };
 
         static int top_left_x, top_left_y;
@@ -38,7 +40,7 @@ namespace GameOfLifeRedo
         
 
         static int cell_count_x, cell_count_y;
-        const int sizeofcell = 20;
+        const int sizeofcell = 3;
         
 
         enum general_state { initializing };
@@ -64,12 +66,14 @@ namespace GameOfLifeRedo
 
         private void GenerationTimer_Tick(object sender, EventArgs e)
         {
+            
             RuleSetModifiedShelter();
+            Generation_Ctr_Label.Text = (++generationcounter).ToString();
         }
 
         private void Start_Button_Click(object sender, EventArgs e)
         {
-            for (int i = 0; i < 900; i++)
+            for (int i = 0; i < cell_count_x*cell_count_y; i++)
             {
                 bytegrid_new[i] = bytegrid[i];
             }
@@ -241,6 +245,19 @@ namespace GameOfLifeRedo
                 hasaliveneighbors[neighbors[buttonnumber, i]] = (aliveneighbors_count[neighbors[buttonnumber, i]] != 0);
             }
         }
+        private void NeighborGradientSumInc(int buttonnumber, int numberoftimes)
+        {
+            for (int j = 0; j < numberoftimes; j++)
+            {
+                for (int i = 0; i < 8; i++)
+                {
+                    hasaliveneighbors[neighbors[buttonnumber, i]] = true;
+                    neighbors_gradient_sum[neighbors[buttonnumber, i]]++;
+
+                }
+            }
+
+        }
         private void NeighborGradientSumInc(int buttonnumber)
         {
             
@@ -252,6 +269,7 @@ namespace GameOfLifeRedo
             }
            
         }
+        
         private void NeighborGradientSumDec(int buttonnumber)
         {
             
@@ -375,7 +393,7 @@ namespace GameOfLifeRedo
         private void button1_Click(object sender, EventArgs e)
         {
             //InitVariables();
-            AdjustWinFrame();
+            //AdjustWinFrame();
 
 
         }
@@ -407,7 +425,6 @@ namespace GameOfLifeRedo
                     {
                         if (isalive[i])
                         {
-
                             bytegrid_new[i]--;
                         }
                     }
@@ -435,11 +452,166 @@ namespace GameOfLifeRedo
             UpdateColorAll();
         }
 
+        private void GridPanel_MouseDown(object sender, MouseEventArgs e)
+        {
+            for(int i = 0; i< cell_count_x*cell_count_y; i++)
+            {
+                if(e.Location.X >= rect_grid[i].Location.X && e.Location.Y >= rect_grid[i].Location.Y)
+                {
+                    if (e.Location.X <= rect_grid[i].Location.X + sizeofcell && e.Location.Y <= rect_grid[i].Location.Y + sizeofcell)
+                        RectClick(i);
+                }
+            }
+        }
+        private void ModifiedButtonIncGeneralized(int gnumber, int numberoftimes)
+        {
+            for (int i = 0; i < numberoftimes; i++)
+            {
+                if (!isalive[gnumber])
+                {
+                    isalive[gnumber] = true;
+                    AliveNeighborsIncBool(gnumber);
+                }
+                NeighborGradientSumInc(gnumber);
+            }
+
+
+        }
+        private void ModifiedButtonIncGeneralized(int gnumber)
+        {
+            if (!isalive[gnumber])
+            {
+                isalive[gnumber] = true;
+                AliveNeighborsIncBool(gnumber);
+            }
+            NeighborGradientSumInc(gnumber);
+
+
+        }
+        
+        private void RectClick(int gnumber)
+        {
+            if (bytegrid[gnumber]== 0) 
+            {
+                g.FillRectangle(mygrey1, rect_grid[gnumber]);
+                bytegrid[gnumber] = 1;
+                bytegrid_new[gnumber] = 1;
+                ModifiedButtonIncGeneralized(gnumber);
+            }
+            else if (bytegrid[gnumber] == 1)
+            {
+                g.FillRectangle(mygrey2, rect_grid[gnumber]);
+                bytegrid[gnumber] = 2;
+                bytegrid_new[gnumber] = 2;
+                ModifiedButtonIncGeneralized(gnumber);
+
+            }
+            else if (bytegrid[gnumber] == 2)
+            {
+                g.FillRectangle(mygrey3, rect_grid[gnumber]);
+                bytegrid[gnumber] = 3;
+                bytegrid_new[gnumber] = 3;
+               
+                ModifiedButtonIncGeneralized(gnumber);
+
+            }
+            else if (bytegrid[gnumber] == 3)
+            {
+                g.FillRectangle(full_black, rect_grid[gnumber]);
+                bytegrid[gnumber] = 4;
+                bytegrid_new[gnumber] = 4;
+               
+                ModifiedButtonIncGeneralized(gnumber);
+
+            }
+            else if (bytegrid[gnumber] == 4)
+            {
+                g.FillRectangle(dead_white, rect_grid[gnumber]);
+                bytegrid[gnumber] = 0;
+                bytegrid_new[gnumber] = 0;
+                
+                AliveNeighborsDecBool(gnumber);
+                isalive[gnumber] = false;
+                for (int i = 0; i < 4; i++)
+                    NeighborGradientSumDec(gnumber);
+            }
+        }
+
+        //private void Submit_Template_Button_Click(object sender, EventArgs e)
+        //{
+            
+        //    Submit_TextBox.ReadOnly = true;
+        //    string tmp_fileName = Submit_TextBox.Text + ".txt";
+        //    string fullPath = Path.GetFullPath(tmp_fileName);
+        //    string directoryName = Path.GetDirectoryName(fullPath);
+        //    string vorlagenDirectoryName;
+        //    string vorlagenDirectoryName_tmp = directoryName + "\\Vorlagen";
+            
+        //    vorlagenDirectoryName = vorlagenDirectoryName_tmp + "\\Modifiziert";
+        //    if (!Directory.Exists(vorlagenDirectoryName))
+        //    {
+        //        Directory.CreateDirectory(vorlagenDirectoryName);
+        //    }
+        //    string fileName = vorlagenDirectoryName + "\\" + tmp_fileName;
+        //    if (File.Exists(fileName))
+        //        MessageBox.Show("Fehler: Eine Vorlage mit diesem Namen besteht bereits");
+        //    else
+        //    {
+        //        byte[] brid_and_info = new byte[910];
+        //        for (int i = 0; i < 900; i++)
+        //        {
+        //            brid_and_info[i] = bytegrid[i];
+
+
+        //        }
+        //        if (version == 0)
+        //            brid_and_info[901] = 0;
+        //        else if (version == 1)
+        //        {
+        //            brid_and_info[901] = 1;
+        //            brid_and_info[902] = ModifiedGamemodeToByte(gamemode);
+        //        }
+
+        //        File.WriteAllBytes(fileName, brid_and_info);
+        //        //Start
+        //        ToolStripMenuItem testToolStripMenuItem;
+        //        testToolStripMenuItem = new ToolStripMenuItem();
+        //        if (version == 0)
+        //            klassischToolStripMenuItem2.DropDownItems.AddRange(new ToolStripItem[] {
+        //        testToolStripMenuItem
+        //        });
+        //        else if (version == 1)
+        //            modifiziertToolStripMenuItem2.DropDownItems.AddRange(new ToolStripItem[] {
+        //        testToolStripMenuItem
+        //        });
+        //        testToolStripMenuItem.Name = Path.GetFileNameWithoutExtension(fileName);
+        //        testToolStripMenuItem.Size = new System.Drawing.Size(203, 22);
+        //        testToolStripMenuItem.Text = Path.GetFileNameWithoutExtension(fileName);
+        //        testToolStripMenuItem.Click += new System.EventHandler(LoadVorlage_Click);
+
+
+
+        //        MessageBox.Show("Vorlage " + Path.GetFileNameWithoutExtension(fileName) + " wurde erfolgreich gespeichert.");
+        //    }
+
+        //    label1.Hide();
+        //    button_submit_template.Hide();
+        //    ControlTextBox.Text = "";
+            
+        //}
+
         private void ManualTick_Button_Click(object sender, EventArgs e)
         {
             
             RuleSetModifiedShelter();
         }
+
+        private void Rand_Button_Click(object sender, EventArgs e)
+        {
+            Randomize();
+        }
+
+        
 
         private void BytegridChangeAction()
         {
@@ -463,8 +635,7 @@ namespace GameOfLifeRedo
                 else if (bytegrid_new[i] > bytegrid[i])
                 {
                     bytegrid_haschanged[i] = true;
-                    NeighborGradientSumInc(i);
-                    isalive[i] = true;
+                    ModifiedButtonIncGeneralized(i);
 
                     
 
@@ -488,7 +659,7 @@ namespace GameOfLifeRedo
             }
             if (cell_count_x % 2 != cell_count_y % 2)
             {
-               // MessageBox.Show("True Symmetric ist verschoben");
+               MessageBox.Show("True Symmetric ist verschoben");
 
             }
             for (int i = 0; i < range; i++)
@@ -497,8 +668,7 @@ namespace GameOfLifeRedo
                 {
 
                     
-                    if (cell_count_x % 2 == 0 && cell_count_y % 2 == 0)
-                    {
+                    
                         int point1 = (cell_count_y / 2 * cell_count_x - cell_count_x/2);
                         int point2 = point1 + 1;
                         int point3 = point1 + cell_count_x;
@@ -606,75 +776,46 @@ namespace GameOfLifeRedo
                                 bytegrid[n1] = 2;
                                 AliveNeighborsIncBool(n1);
                                 isalive[n1] = true;
-                                for (int k = 0; k < 2; k++)
-                                {
-                                    NeighborGradientSumInc(n1);
-                                }
-
+                                    NeighborGradientSumInc(n1, 2);
                                 g.FillRectangle(mygrey2, rect_grid[n2]);
                                 bytegrid[n2] = 2;
                                 AliveNeighborsIncBool(n2);
                                 isalive[n2] = true;
-                                for (int k = 0; k < 2; k++)
-                                {
-                                    NeighborGradientSumInc(n2);
-                                }
-
+                                    NeighborGradientSumInc(n2,2);
                                 g.FillRectangle(mygrey2, rect_grid[n3]);
                                 bytegrid[n3] = 2;
                                 AliveNeighborsIncBool(n3);
                                 isalive[n3] = true;
-                                for (int k = 0; k < 2; k++)
-                                {
-                                    NeighborGradientSumInc(n3);
-                                }
-
+                                    NeighborGradientSumInc(n3,2);
                                 g.FillRectangle(mygrey2, rect_grid[n4]);
                                 bytegrid[n4] = 2;
                                 AliveNeighborsIncBool(n4);
                                 isalive[n4] = true;
-                                for (int k = 0; k < 2; k++)
-                                {
-                                    NeighborGradientSumInc(n4);
-                                }
-
+                                    NeighborGradientSumInc(n4,2);
                                 if (n1 != n12)
                                 {
                                     g.FillRectangle(mygrey2, rect_grid[n12]);
                                     bytegrid[n12] = 2;
                                     AliveNeighborsIncBool(n12);
                                     isalive[n12] = true;
-                                    for (int k = 0; k < 2; k++)
-                                    {
-                                        NeighborGradientSumInc(n12);
-                                    }
-
+                                        NeighborGradientSumInc(n12,2);
                                     g.FillRectangle(mygrey2, rect_grid[n22]);
                                     bytegrid[n22] = 2;
                                     AliveNeighborsIncBool(n22);
                                     isalive[n22] = true;
-                                    for (int k = 0; k < 2; k++)
-                                    {
-                                        NeighborGradientSumInc(n22);
-                                    }
-
+                                        NeighborGradientSumInc(n22,2);
                                     g.FillRectangle(mygrey2, rect_grid[n32]);
                                     bytegrid[n32] = 2;
                                     AliveNeighborsIncBool(n32);
                                     isalive[n32] = true;
-                                    for (int k = 0; k < 2; k++)
-                                    {
-                                        NeighborGradientSumInc(n32);
-                                    }
-
+                                        NeighborGradientSumInc(n32 ,2);
                                     g.FillRectangle(mygrey2, rect_grid[n42]);
                                     bytegrid[n42] = 2;
                                     AliveNeighborsIncBool(n42);
                                     isalive[n42] = true;
-                                    for (int k = 0; k < 2; k++)
-                                    {
-                                        NeighborGradientSumInc(n42);
-                                    }
+                                    
+                                        NeighborGradientSumInc(n42, 2);
+                                    
                                 }
                                 break;
                             case 3:
@@ -683,40 +824,36 @@ namespace GameOfLifeRedo
                                 AliveNeighborsIncBool(n1);
                                 isalive[n1] = true;
 
-                                for (int k = 0; k < 3; k++)
-                                {
-                                    NeighborGradientSumInc(n1);
-                                }
+                                
+                                    NeighborGradientSumInc(n1, 3);
+                                
 
                                 g.FillRectangle(mygrey3, rect_grid[n2]);
                                 bytegrid[n2] = 3;
                                 AliveNeighborsIncBool(n2);
                                 isalive[n2] = true;
 
-                                for (int k = 0; k < 3; k++)
-                                {
-                                    NeighborGradientSumInc(n2);
-                                }
+                                
+                                    NeighborGradientSumInc(n2, 3);
+                                
 
                                 g.FillRectangle(mygrey3, rect_grid[n3]);
                                 bytegrid[n3] = 3;
                                 AliveNeighborsIncBool(n3);
                                 isalive[n3] = true;
 
-                                for (int k = 0; k < 3; k++)
-                                {
-                                    NeighborGradientSumInc(n3);
-                                }
+                                
+                                    NeighborGradientSumInc(n3, 3);
+                                
 
                                 g.FillRectangle(mygrey3, rect_grid[n4]);
                                 bytegrid[n4] = 3;
                                 AliveNeighborsIncBool(n4);
                                 isalive[n4] = true;
 
-                                for (int k = 0; k < 3; k++)
-                                {
-                                    NeighborGradientSumInc(n4);
-                                }
+                                
+                                    NeighborGradientSumInc(n4, 3);
+                                
                                 if (n1 != n12)
                                 {
                                     g.FillRectangle(mygrey3, rect_grid[n12]);
@@ -724,39 +861,35 @@ namespace GameOfLifeRedo
                                     AliveNeighborsIncBool(n12);
                                     isalive[n12] = true;
 
-                                    for (int k = 0; k < 3; k++)
-                                    {
-                                        NeighborGradientSumInc(n12);
-                                    }
+                                    
+                                        NeighborGradientSumInc(n12, 3);
+                                    
 
                                     g.FillRectangle(mygrey3, rect_grid[n22]);
                                     bytegrid[n22] = 3;
                                     AliveNeighborsIncBool(n22);
                                     isalive[n22] = true;
 
-                                    for (int k = 0; k < 3; k++)
-                                    {
-                                        NeighborGradientSumInc(n22);
-                                    }
+                                    
+                                        NeighborGradientSumInc(n22, 3);
+                                    
 
                                     g.FillRectangle(mygrey3, rect_grid[n32]);
                                     bytegrid[n32] = 3;
                                     AliveNeighborsIncBool(n32);
                                     isalive[n32] = true;
 
-                                    for (int k = 0; k < 3; k++)
-                                    {
-                                        NeighborGradientSumInc(n32);
-                                    }
+                                    
+                                        NeighborGradientSumInc(n32, 3);
+                                    
 
                                     g.FillRectangle(mygrey3, rect_grid[n42]);
                                     bytegrid[n42] = 3;
                                     AliveNeighborsIncBool(n42);
                                     isalive[n42] = true;
-                                    for (int k = 0; k < 3; k++)
-                                    {
-                                        NeighborGradientSumInc(n42);
-                                    }
+                                    
+                                        NeighborGradientSumInc(n42, 3);
+                                    
                                 }
                                 break;
                             case 4:
@@ -765,81 +898,66 @@ namespace GameOfLifeRedo
                                
                                 AliveNeighborsIncBool(n1);
                                 isalive[n1] = true;
-                                for (int k = 0; k < 4; k++)
-                                {
-                                    NeighborGradientSumInc(n1);
-                                }
+                                
+                                    NeighborGradientSumInc(n1, 4);
+                                
 
                                 g.FillRectangle(full_black, rect_grid[n2]);
                                 bytegrid[n2] = 4;
                                 
                                 AliveNeighborsIncBool(n2);
                                 isalive[n2] = true;
-                                for (int k = 0; k < 4; k++)
-                                {
-                                    NeighborGradientSumInc(n2);
-                                }
+                                
+                                    NeighborGradientSumInc(n2, 4);
+                                
 
                                 g.FillRectangle(full_black, rect_grid[n3]);
                                 bytegrid[n3] = 4;
                                 
                                 AliveNeighborsIncBool(n3);
                                 isalive[n3] = true;
-                                for (int k = 0; k < 4; k++)
-                                {
-                                    NeighborGradientSumInc(n3);
-                                }
+                                
+                                    NeighborGradientSumInc(n3, 4);
+                                
 
                                 g.FillRectangle(full_black, rect_grid[n4]);
                                 bytegrid[n4] = 4;
                                 
                                 AliveNeighborsIncBool(n4);
                                 isalive[n4] = true;
-                                for (int k = 0; k < 4; k++)
-                                {
-                                    NeighborGradientSumInc(n4);
-                                }
+                                
+                                    NeighborGradientSumInc(n4, 4);
+
                                 if (n1 != n12)
                                 {
                                     g.FillRectangle(full_black, rect_grid[n12]);
                                     bytegrid[n12] = 4;
-                                   
+
                                     AliveNeighborsIncBool(n12);
                                     isalive[n12] = true;
-                                    for (int k = 0; k < 4; k++)
-                                    {
-                                        NeighborGradientSumInc(n12);
-                                    }
+
+                                    NeighborGradientSumInc(n12, 4);
+
 
                                     g.FillRectangle(full_black, rect_grid[n22]);
                                     bytegrid[n22] = 4;
-                                    
+
                                     AliveNeighborsIncBool(n22);
                                     isalive[n22] = true;
-                                    for (int k = 0; k < 4; k++)
-                                    {
-                                        NeighborGradientSumInc(n22);
-                                    }
+
+                                    NeighborGradientSumInc(n22, 4);
 
                                     g.FillRectangle(full_black, rect_grid[n32]);
                                     bytegrid[n32] = 4;
-                                    
                                     AliveNeighborsIncBool(n32);
                                     isalive[n32] = true;
-                                    for (int k = 0; k < 4; k++)
-                                    {
-                                        NeighborGradientSumInc(n32);
-                                    }
+                                    NeighborGradientSumInc(n32, 4);
 
                                     g.FillRectangle(full_black, rect_grid[n42]);
                                     bytegrid[n42] = 4;
-                                   
                                     AliveNeighborsIncBool(n42);
                                     isalive[n42] = true;
-                                    for (int k = 0; k < 4; k++)
-                                    {
-                                        NeighborGradientSumInc(n42);
-                                    }
+                                    NeighborGradientSumInc(n42, 4);
                                 }
                                 break;
 
@@ -847,10 +965,54 @@ namespace GameOfLifeRedo
                                 break;
                         }
 
-                    }
+                    
                 }
 
             }
+        }
+        private void Randomize()
+        {
+
+            Random rnd = new Random();
+
+                for (int i = 0; i < cell_count_x*cell_count_y; i++)
+                {
+                    switch (rnd.Next(0, 5))
+                    {
+                        case 0:
+                            g.FillRectangle(dead_white, rect_grid[i]);
+                            bytegrid[i] = 0;
+                            isalive[i] = false;
+
+                            break;
+                        case 1:
+                            g.FillRectangle(mygrey1, rect_grid[i]);
+                            bytegrid[i] = 1;
+                            ModifiedButtonIncGeneralized(i);
+
+
+                        break;
+                        case 2:
+                            g.FillRectangle(mygrey2, rect_grid[i]);
+                            bytegrid[i] = 2;
+                            ModifiedButtonIncGeneralized(i, 2);
+                        break;
+                        case 3:
+                            g.FillRectangle(mygrey3, rect_grid[i]);
+                            bytegrid[i] = 3;
+                        ModifiedButtonIncGeneralized(i, 3);
+                        break;
+                        case 4:
+                            g.FillRectangle(full_black, rect_grid[i]);
+                            bytegrid[i] = 4;
+                        ModifiedButtonIncGeneralized(i, 4);
+                        break;
+
+                        default:
+                            break;
+                    }
+
+                }
         }
     }
 }
