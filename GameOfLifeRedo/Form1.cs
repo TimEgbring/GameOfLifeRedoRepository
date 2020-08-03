@@ -21,8 +21,10 @@ namespace GameOfLifeRedo
         readonly Brush mygrey2 = new SolidBrush(Color.FromArgb(128, 128, 128));
         readonly Brush mygrey3 = new SolidBrush(Color.FromArgb(64, 64, 64));
         readonly Brush full_black = new SolidBrush(Color.FromArgb(0, 0, 0));
+        const int placeforinformation = 10;
         Graphics g = null;
         bool isrunning = false;
+        bool gamehasstarted = false;
         bool[] isalive;
         bool[] hasaliveneighbors;
         byte[] aliveneighbors_count;
@@ -33,6 +35,7 @@ namespace GameOfLifeRedo
         byte[] neighbors_gradient_sum;
         Rectangle[] rect_grid;
         int generationcounter;
+        DateTime time_start;
         enum Compass { N, E, S, W, NE, SE, SW, NW };
 
         static int top_left_x, top_left_y;
@@ -40,39 +43,225 @@ namespace GameOfLifeRedo
         
 
         static int cell_count_x, cell_count_y;
-        const int sizeofcell = 3;
-        
-
-        enum general_state { initializing };
+        public int sizeofcell = 6;
+        public struct GameState
+        {
+            public int generationcounter;
+            public int cell_count_x, cell_count_y;
+            public bool isrunning;
+            public int sizeofcell;
+            public bool gameexists;
+            public DateTime time_start;
+            public Rectangle[] rect_grid;        
+            public byte[] bytegrid;
+            public byte[] bytegrid_new;
+            public bool[] bytegrid_haschanged;
+            public int top_left_x, top_left_y;
+            public int bottom_right_x, bottom_right_y;
+            public bool[] hasaliveneighbors;
+            public byte[] aliveneighbors_count;
+            public byte[] neighbors_gradient_sum;
+            public bool[] isalive;
+        }
+        GameState gamestate;
 
         public Form1()
         {
             InitializeComponent();
-
+            InitVorlagenToolstrip();
+            int sz = Screen.PrimaryScreen.WorkingArea.Size.Width;
+            int szh = Screen.PrimaryScreen.WorkingArea.Size.Height -100;
+          
+            this.Size = new Size(sz, szh);
+            
+            this.SetStyle(ControlStyles.OptimizedDoubleBuffer| ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.SupportsTransparentBackColor, true);
             InitVariables();
             InitNeighbors();
-
             
+
 
             AdjustWinFrame();
-            g = GridColorFlowPanel.CreateGraphics();
             
-
-
-
-
+            g = GridColorFlowPanel.CreateGraphics();
+            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.None;
+            g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.Low;
+            g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighSpeed;
 
         }
 
+        private GameState GetCurrentGameState()
+        {
+            GameState gstate = new GameState()
+            {
+                generationcounter = generationcounter,
+                cell_count_x = cell_count_x,
+                cell_count_y = cell_count_y,
+                isrunning = isrunning,
+                sizeofcell = sizeofcell,
+
+                time_start = time_start,
+
+
+                top_left_x = top_left_x,
+                top_left_y = top_left_y,
+                bottom_right_x = bottom_right_x,
+                bottom_right_y = bottom_right_y,
+
+                rect_grid = DeepCopy(rect_grid),
+                bytegrid = DeepCopy(bytegrid),
+                bytegrid_new = DeepCopy(bytegrid_new),
+                bytegrid_haschanged = DeepCopy(bytegrid_haschanged),
+                hasaliveneighbors = DeepCopy(hasaliveneighbors),
+                aliveneighbors_count = DeepCopy(aliveneighbors_count),
+                neighbors_gradient_sum = DeepCopy(neighbors_gradient_sum),
+                isalive = DeepCopy(isalive),
+            };
+
+            return gstate;
+
+        }
+        public void SetCurrentGameState(GameState gstate)
+        {
+            generationcounter = gstate.generationcounter;
+            cell_count_x = gstate.cell_count_x;
+            cell_count_y = gstate.cell_count_y;
+            isrunning = gstate.isrunning;
+            sizeofcell = gstate.sizeofcell;
+            time_start = gstate.time_start;
+            top_left_x = gstate.top_left_x;
+            top_left_y = gstate.top_left_y;
+            bottom_right_x = gstate.bottom_right_x;
+            bottom_right_y = gstate.bottom_right_y;
+            rect_grid = DeepCopy(gstate.rect_grid);
+            bytegrid = DeepCopy(gstate.bytegrid);
+            bytegrid_new = DeepCopy(gstate.bytegrid_new);
+            bytegrid_haschanged = DeepCopy(gstate.bytegrid_haschanged);
+            hasaliveneighbors = DeepCopy(gstate.hasaliveneighbors);
+            aliveneighbors_count = DeepCopy(gstate.aliveneighbors_count);
+            neighbors_gradient_sum = DeepCopy(gstate.neighbors_gradient_sum);
+            isalive = DeepCopy(gstate.isalive);
+        }
+        public static T DeepCopy<T>(T obj)
+        {
+            if (!typeof(T).IsSerializable)
+            {
+                throw new Exception("The source object must be serializable");
+            }
+            if (Object.ReferenceEquals(obj, null))
+            {
+                throw new Exception("The source object must not be null");
+            }
+            T result = default(T);
+            using (var memoryStream = new MemoryStream())
+            {
+                var formatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                formatter.Serialize(memoryStream, obj);
+                memoryStream.Seek(0, SeekOrigin.Begin);
+                result = (T)formatter.Deserialize(memoryStream);
+                memoryStream.Close();
+            }
+            return result;
+            
+        }
+        private void ResetGame()
+        {
+            PauseGame();
+            gamehasstarted = false;
+            isalive = new bool[cell_count_x * cell_count_y];
+            
+            hasaliveneighbors = new bool[cell_count_x * cell_count_y];
+            aliveneighbors_count = new byte[cell_count_x * cell_count_y];
+            bytegrid = new byte[cell_count_x * cell_count_y];
+            bytegrid_new=new byte[cell_count_x * cell_count_y];
+            bytegrid_haschanged=new bool[cell_count_x * cell_count_y];
+            neighbors_gradient_sum = new byte[cell_count_x * cell_count_y];
+            GridColorFlowPanel.Refresh();
+            generationcounter = 0;
+            Generation_Ctr_Label.Text = "0";
+        }
+        private void InitVariables()
+        {
+            top_left_x = GridColorFlowPanel.Location.X;
+            top_left_y = GridColorFlowPanel.Location.Y;
+            int tmp_bottom_right_x = top_left_x + GridColorFlowPanel.Width;
+            int tmp_bottom_right_y = top_left_y + GridColorFlowPanel.Height - PanelBottom.Height;
+
+            cell_count_x = (tmp_bottom_right_x - top_left_x - 1) / (sizeofcell + 1);
+
+            cell_count_y = (tmp_bottom_right_y - top_left_y - 1) / (sizeofcell + 1);
+            bottom_right_x = 1 + (sizeofcell + 1) * cell_count_x;
+            bottom_right_y = 1 + (sizeofcell + 1) * cell_count_y;
+
+            rect_grid = new Rectangle[cell_count_y * cell_count_x];
+            for (int i = 0; i < cell_count_y; i++)
+            {
+                for (int j = 0; j < cell_count_x; j++)
+                {
+                    rect_grid[cell_count_x * i + j].X = top_left_x + j * sizeofcell + j + 1;
+                    rect_grid[cell_count_x * i + j].Y = top_left_y + i * sizeofcell + i + 1;
+                    rect_grid[cell_count_x * i + j].Size = new Size(sizeofcell, sizeofcell);
+                }
+            }
+            bytegrid = new byte[cell_count_x * cell_count_y];
+
+
+            isalive = new bool[cell_count_x * cell_count_y];
+            hasaliveneighbors = new bool[cell_count_x * cell_count_y];
+            aliveneighbors_count = new byte[cell_count_x * cell_count_y];
+            bytegrid_new = new byte[cell_count_x * cell_count_y];
+            bytegrid_haschanged = new bool[cell_count_x * cell_count_y];
+            neighbors = new int[cell_count_x * cell_count_y, 8];
+            neighbors_gradient_sum = new byte[cell_count_x * cell_count_y];
+        }
+        private void ResetToNewSize()
+        {
+           ResetGame();
+
+            int sz = Screen.PrimaryScreen.WorkingArea.Size.Width;
+            int szh = Screen.PrimaryScreen.WorkingArea.Size.Height - 100;
+            this.Size = new Size(sz, szh);//WIESO GRIDCOLORPANEL.HEIGHT ÄNDERT
+            GridColorFlowPanel.Update();
+
+            InitVariables();
+            
+
+            InitNeighbors();
+            AdjustWinFrame();
+            g = null;
+            g = GridColorFlowPanel.CreateGraphics();
+            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.None;
+            g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.Low;
+            g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighSpeed;
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            //InitVariables();
+            //AdjustWinFrame();
+
+
+        }
+        private void AdjustWinFrame()
+        {
+
+            this.Size = new Size(bottom_right_x + 16, bottom_right_y + PanelBottom.Height + 39); //Offset from Form1 Size and InnerForm1 Size and MainMenu
+
+        }
         private void GenerationTimer_Tick(object sender, EventArgs e)
         {
-            
+            if (generationcounter == 500)
+                Start_Button_Click(null, null);
             RuleSetModifiedShelter();
             Generation_Ctr_Label.Text = (++generationcounter).ToString();
         }
 
         private void Start_Button_Click(object sender, EventArgs e)
         {
+            if (!gamehasstarted)
+            {
+                gamehasstarted = true;
+                gamestate = GetCurrentGameState();
+            }
             for (int i = 0; i < cell_count_x*cell_count_y; i++)
             {
                 bytegrid_new[i] = bytegrid[i];
@@ -80,7 +269,11 @@ namespace GameOfLifeRedo
             if (!isrunning)
                 StartGame();
             else
+            {
+                ElapsedTime.Show();
+                ElapsedTime.Text = (DateTime.Now - time_start).ToString();
                 PauseGame();
+            }
         }
 
         private void StartGame()
@@ -88,6 +281,7 @@ namespace GameOfLifeRedo
             Start_Button.Text = "Pause";
             isrunning = true;
             
+            time_start = DateTime.Now;
             GenerationTimer.Start();
         }
         private void PauseGame()
@@ -96,39 +290,7 @@ namespace GameOfLifeRedo
             isrunning = false;
             GenerationTimer.Stop();
         }
-        private void InitVariables()
-        {
-            top_left_x = GridColorFlowPanel.Location.X;
-            top_left_y = GridColorFlowPanel.Location.Y;
-            int tmp_bottom_right_x = top_left_x + GridColorFlowPanel.Width;
-            int tmp_bottom_right_y = top_left_y + GridColorFlowPanel.Height - PanelBottom.Height;
-            cell_count_x = (tmp_bottom_right_x - top_left_x - 1) / (sizeofcell + 1);
-            
-            cell_count_y = (tmp_bottom_right_y - top_left_y -1) / (sizeofcell+1);
-            bottom_right_x = 1 + (sizeofcell + 1) * cell_count_x;
-            bottom_right_y = 1 + (sizeofcell + 1) * cell_count_y;
-            
-            rect_grid = new Rectangle[cell_count_y * cell_count_x];
-            for(int i = 0; i < cell_count_y; i++)
-            {
-                for(int j = 0; j < cell_count_x; j++)
-                {
-                    rect_grid[cell_count_x * i + j].X = top_left_x + j * sizeofcell + j + 1;
-                    rect_grid[cell_count_x * i + j].Y = top_left_y + i * sizeofcell + i + 1;
-                    rect_grid[cell_count_x * i + j].Size = new Size(sizeofcell,sizeofcell);
-                }
-            }
-            bytegrid = new byte[cell_count_x * cell_count_y];
-
-            
-            isalive = new bool[cell_count_x * cell_count_y]; 
-            hasaliveneighbors = new bool[cell_count_x * cell_count_y];
-            aliveneighbors_count = new byte[cell_count_x * cell_count_y];
-            bytegrid_new = new byte[cell_count_x * cell_count_y];
-            bytegrid_haschanged = new bool[cell_count_x * cell_count_y];
-            neighbors = new int[cell_count_x * cell_count_y,8];
-            neighbors_gradient_sum=new byte[cell_count_x * cell_count_y];
-        }
+       
         private void InitNeighbors()
         {
             for (int i = 0; i < cell_count_x * cell_count_y; i++)
@@ -291,6 +453,7 @@ namespace GameOfLifeRedo
             {
                 if (bytegrid_haschanged[i])
                 {
+
                     if (bytegrid[i] == 0)
                         sumwhite++;
                     else if (bytegrid[i] == 1)
@@ -313,6 +476,7 @@ namespace GameOfLifeRedo
             Rectangle[] grey2 = new Rectangle[sumgrey2];
             Rectangle[] grey3 = new Rectangle[sumgrey3];
             Rectangle[] black = new Rectangle[sumblack];
+            
             for (int i = 0; i < cell_count_x * cell_count_y; i++)
             {
                 if (bytegrid_haschanged[i])
@@ -329,7 +493,9 @@ namespace GameOfLifeRedo
                         black[blackcount++] = rect_grid[i];
                 }
             }
-            if(white.Length != 0)
+
+
+            if (white.Length != 0)
                 g.FillRectangles(dead_white, white);
             if (grey1.Length != 0)
                 g.FillRectangles(mygrey1, grey1);
@@ -369,9 +535,9 @@ namespace GameOfLifeRedo
 
         private void GridColorFlowPanel_Paint(object sender, PaintEventArgs e)
         {
-            
+
+
             InitLineGrid();
-            
             // e.Graphics.TranslateTransform(GridColorFlowPanel.AutoScrollPosition.X, GridColorFlowPanel.AutoScrollPosition.Y);
         }
 
@@ -379,33 +545,22 @@ namespace GameOfLifeRedo
         {
             for(int i = 0; i < cell_count_x; i++)
             {
-                g.DrawLine(new Pen(Color.Red), rect_grid[i].X-1, top_left_y, rect_grid[i].X-1, bottom_right_y-1);
+                g.DrawLine(new Pen(Color.LightGray), rect_grid[i].X-1, top_left_y, rect_grid[i].X-1, bottom_right_y-1);
 
             }
-            g.DrawLine(new Pen(Color.Red), rect_grid[cell_count_x-1].X +sizeofcell, top_left_y, rect_grid[cell_count_x-1].X +sizeofcell, bottom_right_y-1);
+            g.DrawLine(new Pen(Color.LightGray), rect_grid[cell_count_x-1].X +sizeofcell, top_left_y, rect_grid[cell_count_x-1].X +sizeofcell, bottom_right_y-1);
             for (int i = 0; i < cell_count_y; i++)
             {
-                g.DrawLine(new Pen(Color.Red), top_left_x, rect_grid[i*cell_count_x].Y-1, bottom_right_x-1, rect_grid[i * cell_count_x].Y-1);
+                g.DrawLine(new Pen(Color.LightGray), top_left_x, rect_grid[i*cell_count_x].Y-1, bottom_right_x-1, rect_grid[i * cell_count_x].Y-1);
             }
-            g.DrawLine(new Pen(Color.Red), top_left_x, rect_grid[cell_count_y * cell_count_x-1].Y +sizeofcell, bottom_right_x - 1, rect_grid[cell_count_y * cell_count_x-1].Y +sizeofcell);
+            g.DrawLine(new Pen(Color.LightGray), top_left_x, rect_grid[cell_count_y * cell_count_x-1].Y +sizeofcell, bottom_right_x - 1, rect_grid[cell_count_y * cell_count_x-1].Y +sizeofcell);
         }
 
-        private void button1_Click(object sender, EventArgs e)
-        {
-            //InitVariables();
-            //AdjustWinFrame();
-
-
-        }
-        private void AdjustWinFrame()
-        {
-            
-            this.Size = new Size(bottom_right_x+16, bottom_right_y + PanelBottom.Height + 39); //Offset from Form1 Size and InnerForm1 Size
-
-        }
+        
 
         private void FullSymmetric_Button_Click(object sender, EventArgs e)
         {
+            ResetGame();
             GenerateFullSymmetric();
         }
 
@@ -421,14 +576,14 @@ namespace GameOfLifeRedo
                     {
                         bytegrid_new[i] = bytegrid[i];
                     }
-                    else if (neighbors_gradient_sum[i] < 8 || neighbors_gradient_sum[i] > 12) //Too small or too big
+                    else if (neighbors_gradient_sum[i] < DecBelow.Value || neighbors_gradient_sum[i] > DecAbove.Value) //Too small or too big
                     {
                         if (isalive[i])
                         {
                             bytegrid_new[i]--;
                         }
                     }
-                    else if (neighbors_gradient_sum[i] > 8 && neighbors_gradient_sum[i] < 12) //Just right
+                    else if (neighbors_gradient_sum[i] > IncAbove.Value && neighbors_gradient_sum[i] < IncBelow.Value) //Just right
                     {
                         if (bytegrid[i] != 4)
                         {
@@ -536,70 +691,206 @@ namespace GameOfLifeRedo
                     NeighborGradientSumDec(gnumber);
             }
         }
-
-        //private void Submit_Template_Button_Click(object sender, EventArgs e)
-        //{
+        private byte[] SplitUIntToBytes(uint integer)
+        {
             
-        //    Submit_TextBox.ReadOnly = true;
-        //    string tmp_fileName = Submit_TextBox.Text + ".txt";
-        //    string fullPath = Path.GetFullPath(tmp_fileName);
-        //    string directoryName = Path.GetDirectoryName(fullPath);
-        //    string vorlagenDirectoryName;
-        //    string vorlagenDirectoryName_tmp = directoryName + "\\Vorlagen";
+            List<byte> prebytes = new List<byte>();
             
-        //    vorlagenDirectoryName = vorlagenDirectoryName_tmp + "\\Modifiziert";
-        //    if (!Directory.Exists(vorlagenDirectoryName))
-        //    {
-        //        Directory.CreateDirectory(vorlagenDirectoryName);
-        //    }
-        //    string fileName = vorlagenDirectoryName + "\\" + tmp_fileName;
-        //    if (File.Exists(fileName))
-        //        MessageBox.Show("Fehler: Eine Vorlage mit diesem Namen besteht bereits");
-        //    else
-        //    {
-        //        byte[] brid_and_info = new byte[910];
-        //        for (int i = 0; i < 900; i++)
-        //        {
-        //            brid_and_info[i] = bytegrid[i];
+            if (integer >= Math.Pow(2, 24))
+            {
+                prebytes.Add((byte)(integer >> 24));
+                
+            }
+            if (integer >= Math.Pow(2, 16))
+            {
+                if (integer < Math.Pow(2, 24))
+                    prebytes.Add(0);
+                prebytes.Add((byte)((integer << 8) >> 24));
+            }
+            if (integer >= Math.Pow(2, 8))
+            {
+                prebytes.Add((byte)((integer << 16) >> 24));
+            }
 
-
-        //        }
-        //        if (version == 0)
-        //            brid_and_info[901] = 0;
-        //        else if (version == 1)
-        //        {
-        //            brid_and_info[901] = 1;
-        //            brid_and_info[902] = ModifiedGamemodeToByte(gamemode);
-        //        }
-
-        //        File.WriteAllBytes(fileName, brid_and_info);
-        //        //Start
-        //        ToolStripMenuItem testToolStripMenuItem;
-        //        testToolStripMenuItem = new ToolStripMenuItem();
-        //        if (version == 0)
-        //            klassischToolStripMenuItem2.DropDownItems.AddRange(new ToolStripItem[] {
-        //        testToolStripMenuItem
-        //        });
-        //        else if (version == 1)
-        //            modifiziertToolStripMenuItem2.DropDownItems.AddRange(new ToolStripItem[] {
-        //        testToolStripMenuItem
-        //        });
-        //        testToolStripMenuItem.Name = Path.GetFileNameWithoutExtension(fileName);
-        //        testToolStripMenuItem.Size = new System.Drawing.Size(203, 22);
-        //        testToolStripMenuItem.Text = Path.GetFileNameWithoutExtension(fileName);
-        //        testToolStripMenuItem.Click += new System.EventHandler(LoadVorlage_Click);
-
-
-
-        //        MessageBox.Show("Vorlage " + Path.GetFileNameWithoutExtension(fileName) + " wurde erfolgreich gespeichert.");
-        //    }
-
-        //    label1.Hide();
-        //    button_submit_template.Hide();
-        //    ControlTextBox.Text = "";
+            prebytes.Add((byte)((integer << 24) >> 24));
             
-        //}
+                byte[] finalbytes = prebytes.ToArray();
 
+            return finalbytes;
+        }
+        private int ConvertBytesToInt(byte[] bytes)
+        {
+            
+            int res = 0;
+            for(int i = 0; i <  bytes.Length; i++)
+            {
+                res += (int)(bytes[i] * Math.Pow(256, bytes.Length - i-1));
+            }
+            return res;
+        }
+        
+        private void Submit_Template_Button_Click(object sender, EventArgs e)
+        {
+            PauseGame();
+            if (Submit_TextBox.Text == "")
+            {
+                MessageBox.Show("Fehler: Feld darf nicht leer bleiben!");
+                return;
+            }
+            Submit_TextBox.ReadOnly = true;
+            string tmp_fileName = Submit_TextBox.Text + ".txt";
+            string fullPath = Path.GetFullPath(tmp_fileName);
+            string directoryName = Path.GetDirectoryName(fullPath);
+            
+            string vorlagenDirectoryName = directoryName + "\\Vorlagen";
+
+            if (!Directory.Exists(vorlagenDirectoryName))
+            {
+                Directory.CreateDirectory(vorlagenDirectoryName);
+            }
+            string fileName = vorlagenDirectoryName + "\\" + tmp_fileName;
+            if (File.Exists(fileName))
+                MessageBox.Show("Fehler: Eine Vorlage mit diesem Namen besteht bereits");
+            else
+            {
+                
+                byte[] brid_and_info = new byte[placeforinformation+cell_count_x * cell_count_y];
+                for (int i = 0; i < cell_count_x * cell_count_y; i++)
+                {
+                    brid_and_info[i+placeforinformation] = bytegrid[i];
+
+
+                }
+                byte[] bcellcountx = SplitUIntToBytes((uint)cell_count_x);
+                brid_and_info[0] = (byte) bcellcountx.Length;
+                for (int i = 0; i < bcellcountx.Length; i++)
+                {
+                    brid_and_info[1 + i] = bcellcountx[i];
+                }
+                byte[] bcellcounty = SplitUIntToBytes((uint)cell_count_y);
+                brid_and_info[bcellcountx.Length+1] = (byte)bcellcounty.Length;
+                for (int i = 0; i < bcellcounty.Length; i++)
+                {
+                    brid_and_info[bcellcountx.Length +1 +1 + i] = bcellcounty[i];
+                }
+
+
+                File.WriteAllBytes(fileName, brid_and_info);
+                //Start
+                MenuItem testMenuItem;
+                testMenuItem = new MenuItem();
+                    Vorlagen_menuItem.MenuItems.AddRange(new MenuItem[] {
+                testMenuItem
+                });
+                testMenuItem.Name = Path.GetFileNameWithoutExtension(fileName);
+                
+                testMenuItem.Text = Path.GetFileNameWithoutExtension(fileName);
+                testMenuItem.Click += new System.EventHandler(LoadVorlage_Click);
+
+
+
+                MessageBox.Show("Vorlage " + Path.GetFileNameWithoutExtension(fileName) + " wurde erfolgreich gespeichert.");
+            }
+            Submit_TextBox.ReadOnly = false;
+            Submit_TextBox.Hide();
+            Submit_Template_Button.Hide();
+            Vorlagenname_label.Hide();
+
+        }
+
+        private void LoadVorlage_Click(object sender, EventArgs e)
+        {
+            byte[] loadable_grid;
+            string cd = Directory.GetCurrentDirectory(); // \Debug
+            string vcd;
+            if (Directory.Exists(cd + "\\Vorlagen")) // Existiert
+            {
+                ResetGame();
+                vcd = cd + @"\Vorlagen\";
+                
+                loadable_grid = File.ReadAllBytes(vcd + ((MenuItem)sender).Name + ".txt");
+
+                int lenccountx = loadable_grid[0];
+                int lenccounty = loadable_grid[lenccountx+1];
+                byte[] ccountx = new byte[lenccountx];
+                byte[] ccounty = new byte[lenccounty];
+                for (int i = 0; i < lenccountx; i++)
+                {
+                    ccountx[i] = loadable_grid[1 + i];
+                }
+                for (int i = 0; i < lenccounty; i++)
+                {
+                    ccounty[i] = loadable_grid[lenccountx+ 1+1 + i];
+                }
+
+                cell_count_x = ConvertBytesToInt(ccountx);
+                cell_count_y = ConvertBytesToInt(ccounty);
+
+
+
+                //AdjustLoadedWinFrame();
+                for (int i = 0; i < cell_count_x*cell_count_y; i++)
+                {
+                    for (int j = 0; j < loadable_grid[i+placeforinformation]; j++)
+                    {
+                    RectClick(i);
+                    }
+                }
+            }
+
+            else MessageBox.Show("Es wurde kein Ordner mit dem Namen \"Vorlagen\" gefunden.");
+
+
+        }
+        private void AdjustLoadedWinFrame()
+        {
+            bottom_right_x = 1 + (cell_count_x + 1) * sizeofcell;
+            bottom_right_y = 1 + (cell_count_y + 1) * sizeofcell;
+            this.Size = new Size(bottom_right_x + 16, bottom_right_y + PanelBottom.Height + 39);
+            
+        }
+        private void InitVorlagenToolstrip()
+        {
+            string path = Directory.GetCurrentDirectory() + "\\Vorlagen";
+            
+            if (!Directory.Exists(path))
+                Directory.CreateDirectory(path);
+            
+
+            
+            foreach (string file in Directory.GetFiles((Directory.GetCurrentDirectory() + "\\Vorlagen\\") /*,".txt"*/))
+            {
+                string filename = Path.GetFileNameWithoutExtension(file);
+
+               MenuItem testMenuItem;
+                testMenuItem = new MenuItem();
+                Vorlagen_menuItem.MenuItems.AddRange(new MenuItem[] {
+                testMenuItem
+                });
+
+                testMenuItem.Name = filename;
+                
+                testMenuItem.Text = filename;
+                testMenuItem.Click += new System.EventHandler(LoadVorlage_Click);
+
+            }
+
+        }
+        private Brush ByteToBrush(byte gnumber)
+        {
+
+            if (gnumber == 0)
+                return new SolidBrush(Color.FromArgb(255,255,255));
+            if (gnumber == 1)
+                return new SolidBrush(Color.FromArgb(192, 192, 192));
+            if (gnumber == 2)
+                return new SolidBrush(Color.FromArgb(128, 128, 128));
+            if (gnumber == 3)
+                return new SolidBrush(Color.FromArgb(64, 64, 64));
+            if (gnumber == 4)
+                return new SolidBrush(Color.FromArgb(0, 0, 0));
+            else return null;
+        }
         private void ManualTick_Button_Click(object sender, EventArgs e)
         {
             
@@ -608,10 +899,103 @@ namespace GameOfLifeRedo
 
         private void Rand_Button_Click(object sender, EventArgs e)
         {
+            ResetGame();
             Randomize();
         }
 
+        private void neues_Spiel_MenuItem_Click(object sender, EventArgs e)
+        {
+            
+            //ResetGame();
+            ResetToNewSize();
+            //GridColorFlowPanel.Refresh();
+        }
+
+        private void TBarIncBelow_ValueChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void RegelnAnpassenMenu_Click(object sender, EventArgs e)
+        {
+            GroupBoxVersionChange.Show();
+        }
+
+        private void Button_fertig_regeln_anpassen_Click(object sender, EventArgs e)
+        {
+            GroupBoxVersionChange.Hide();
+        }
+
+        private void DecBelow_ValueChanged(object sender, EventArgs e)
+        {
+            if(DecBelow.Value > IncAbove.Value)
+            {
+                IncAbove.Value=DecBelow.Value -1;
+            }
+        }
+
+        private void IncAbove_ValueChanged(object sender, EventArgs e)
+        {
+            if(IncAbove.Value < DecBelow.Value)
+            {
+                DecBelow.Value = IncAbove.Value + 1;
+            }
+        }
+
+        private void IncBelow_ValueChanged(object sender, EventArgs e)
+        {
+            if (IncBelow.Value > DecAbove.Value)
+            {
+                DecAbove.Value = IncBelow.Value + 1;
+            }
+        }
+
+        private void DecAbove_ValueChanged(object sender, EventArgs e)
+        {
+            if (DecAbove.Value < IncBelow.Value)
+            {
+                IncBelow.Value = DecAbove.Value - 1;
+            }
+        }
+
+        private void GridColorSizeChanged(object sender, EventArgs e)
+        {
+            if(g != null && GridColorFlowPanel.Region!=null)
+                g.Clip = GridColorFlowPanel.Region;
+        }
+
+        private void VorlageSpeichern_MenuItem_Click(object sender, EventArgs e)
+        {
+            Submit_Template_Button.Show();
+            Submit_TextBox.Show();
+            Vorlagenname_label.Show();
+        }
+
         
+
+        private void AnfangsZustand_MenuItem_Click(object sender, EventArgs e)
+        {
+            if (gamestate.bytegrid == null)
+            {
+                MessageBox.Show("Es wurde noch kein Spiel gestartet");
+                return;
+            }
+            ResetGame();
+            SetCurrentGameState(gamestate);
+                for (int i = 0; i < cell_count_x*cell_count_y; i++)
+                {
+                g.FillRectangle(ByteToBrush(bytegrid[i]), rect_grid[i]);
+                }
+                
+            
+
+            
+        }
+
+        private void Checkpunkt_MenuItem_Click(object sender, EventArgs e)
+        {
+            gamestate = GetCurrentGameState();
+        }
 
         private void BytegridChangeAction()
         {
@@ -650,9 +1034,9 @@ namespace GameOfLifeRedo
         
         private void GenerateFullSymmetric() //Implement parity difference (middle line or 2 middle lines?)
         {
-            byte range = 8;
+            byte range = 40;
             Random rnd = new Random();
-            if (range > cell_count_x || range > cell_count_y)
+            if (range*2 > cell_count_x || range*2 > cell_count_y)
             {
                 MessageBox.Show("Range ist zu groß");
                 return;
