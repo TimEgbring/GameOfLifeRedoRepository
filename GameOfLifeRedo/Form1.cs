@@ -213,25 +213,28 @@ namespace GameOfLifeRedo
             neighbors = new int[cell_count_x * cell_count_y, 8];
             neighbors_gradient_sum = new byte[cell_count_x * cell_count_y];
         }
+       
         private void ResetToNewSize()
         {
            ResetGame();
 
-            int sz = Screen.PrimaryScreen.WorkingArea.Size.Width;
-            int szh = Screen.PrimaryScreen.WorkingArea.Size.Height - 100;
-            this.Size = new Size(sz, szh);//WIESO GRIDCOLORPANEL.HEIGHT ÄNDERT
-            GridColorFlowPanel.Update();
+            //int sz = Screen.PrimaryScreen.WorkingArea.Size.Width;
+            //int szh = Screen.PrimaryScreen.WorkingArea.Size.Height - 100;
+            //this.Size = new Size(sz, szh);//WIESO GRIDCOLORPANEL.HEIGHT ÄNDERT
+            
 
             InitVariables();
             
 
             InitNeighbors();
-            AdjustWinFrame();
+            ReAdjustWinFrame();
             g = null;
             g = GridColorFlowPanel.CreateGraphics();
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.None;
             g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.Low;
             g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighSpeed;
+            
+            GridColorFlowPanel.Refresh();
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -243,8 +246,14 @@ namespace GameOfLifeRedo
         }
         private void AdjustWinFrame()
         {
-
+            //this.Size = new Size(1 + cell_count_x * (sizeofcell + 1) + 16, 1 + cell_count_y * (sizeofcell + 1) + PanelBottom.Height + 39);
             this.Size = new Size(bottom_right_x + 16, bottom_right_y + PanelBottom.Height + 39); //Offset from Form1 Size and InnerForm1 Size and MainMenu
+
+        }
+        private void ReAdjustWinFrame() //Seltsame Interaktion, in welcher GridColorPanel.Height sich ohne aufforderung nach initialisierung ändert. Vermutung: MainMenu
+        {
+            //this.Size = new Size(1 + cell_count_x * (sizeofcell + 1) + 16, 1 + cell_count_y * (sizeofcell + 1) + PanelBottom.Height + 39);
+            this.Size = new Size(bottom_right_x + 16, bottom_right_y + PanelBottom.Height + 39+20); //Offset from Form1 Size and InnerForm1 Size and MainMenu
 
         }
         private void GenerationTimer_Tick(object sender, EventArgs e)
@@ -748,7 +757,7 @@ namespace GameOfLifeRedo
             {
                 Directory.CreateDirectory(vorlagenDirectoryName);
             }
-            string fileName = vorlagenDirectoryName + "\\" + tmp_fileName;o
+            string fileName = vorlagenDirectoryName + "\\" + tmp_fileName;
             if (File.Exists(fileName))
                 MessageBox.Show("Fehler: Eine Vorlage mit diesem Namen besteht bereits");
             else
@@ -827,8 +836,10 @@ namespace GameOfLifeRedo
                 cell_count_y = ConvertBytesToInt(ccounty);
 
 
-
-                //AdjustLoadedWinFrame();
+                
+                AdjustLoadedWinFrame();
+                AdjustVariablesLoad();
+                InitNeighbors();
                 for (int i = 0; i < cell_count_x*cell_count_y; i++)
                 {
                     for (int j = 0; j < loadable_grid[i+placeforinformation]; j++)
@@ -836,17 +847,44 @@ namespace GameOfLifeRedo
                     RectClick(i);
                     }
                 }
+                
             }
 
             else MessageBox.Show("Es wurde kein Ordner mit dem Namen \"Vorlagen\" gefunden.");
 
 
         }
+        private void AdjustVariablesLoad()
+        {
+            top_left_x = GridColorFlowPanel.Location.X;
+            top_left_y = GridColorFlowPanel.Location.Y;
+            rect_grid = new Rectangle[cell_count_y * cell_count_x];
+            for (int i = 0; i < cell_count_y; i++)
+            {
+                for (int j = 0; j < cell_count_x; j++)
+                {
+                    rect_grid[cell_count_x * i + j].X = top_left_x + j * sizeofcell + j + 1;
+                    rect_grid[cell_count_x * i + j].Y = top_left_y + i * sizeofcell + i + 1;
+                    rect_grid[cell_count_x * i + j].Size = new Size(sizeofcell, sizeofcell);
+                }
+            }
+            bytegrid = new byte[cell_count_x * cell_count_y];
+
+
+            isalive = new bool[cell_count_x * cell_count_y];
+            hasaliveneighbors = new bool[cell_count_x * cell_count_y];
+            aliveneighbors_count = new byte[cell_count_x * cell_count_y];
+            bytegrid_new = new byte[cell_count_x * cell_count_y];
+            bytegrid_haschanged = new bool[cell_count_x * cell_count_y];
+            neighbors = new int[cell_count_x * cell_count_y, 8];
+            neighbors_gradient_sum = new byte[cell_count_x * cell_count_y];
+        }
         private void AdjustLoadedWinFrame()
         {
-            bottom_right_x = 1 + (cell_count_x + 1) * sizeofcell;
-            bottom_right_y = 1 + (cell_count_y + 1) * sizeofcell;
-            this.Size = new Size(bottom_right_x + 16, bottom_right_y + PanelBottom.Height + 39);
+            
+            bottom_right_x = 1 + cell_count_x * (sizeofcell+1);
+            bottom_right_y = 1 + cell_count_y * (sizeofcell+1);
+            this.Size = new Size(bottom_right_x + 16, bottom_right_y + PanelBottom.Height + 39+20);
             
         }
         private void InitVorlagenToolstrip()
