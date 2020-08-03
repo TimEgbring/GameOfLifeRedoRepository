@@ -748,7 +748,7 @@ namespace GameOfLifeRedo
             {
                 Directory.CreateDirectory(vorlagenDirectoryName);
             }
-            string fileName = vorlagenDirectoryName + "\\" + tmp_fileName;
+            string fileName = vorlagenDirectoryName + "\\" + tmp_fileName;o
             if (File.Exists(fileName))
                 MessageBox.Show("Fehler: Eine Vorlage mit diesem Namen besteht bereits");
             else
