@@ -10,19 +10,30 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 
+
 namespace GameOfLifeRedo
 {
     public partial class Form1 : Form
     {
         
-        readonly Pen blackpen = new Pen(Color.FromArgb(0, 0, 0));
+        
         readonly Brush dead_white = new SolidBrush(Color.FromArgb(255,255,255));
         readonly Brush mygrey1 = new SolidBrush(Color.FromArgb(192, 192, 192));
         readonly Brush mygrey2 = new SolidBrush(Color.FromArgb(128, 128, 128));
         readonly Brush mygrey3 = new SolidBrush(Color.FromArgb(64, 64, 64));
         readonly Brush full_black = new SolidBrush(Color.FromArgb(0, 0, 0));
         const int placeforinformation = 10;
+        bool kopieren = false;
+        bool mouseDown;
+        Point mouseDownPoint = Point.Empty;
+        int mouseDownRectangleNumber = 0;
+        Point mousePoint = Point.Empty;
+        bool[] isselectedbycopy;
+
+
         Graphics g = null;
+        
+
         bool isrunning = false;
         bool gamehasstarted = false;
         bool[] isalive;
@@ -43,7 +54,7 @@ namespace GameOfLifeRedo
         
 
         static int cell_count_x, cell_count_y;
-        public int sizeofcell = 6;
+        public int sizeofcell = 15;
         public struct GameState
         {
             public int generationcounter;
@@ -70,8 +81,8 @@ namespace GameOfLifeRedo
             InitializeComponent();
             InitVorlagenToolstrip();
             int sz = Screen.PrimaryScreen.WorkingArea.Size.Width;
-            int szh = Screen.PrimaryScreen.WorkingArea.Size.Height -100;
-          
+            int szh = Screen.PrimaryScreen.WorkingArea.Size.Height;
+            
             this.Size = new Size(sz, szh);
             
             this.SetStyle(ControlStyles.OptimizedDoubleBuffer| ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.SupportsTransparentBackColor, true);
@@ -86,6 +97,7 @@ namespace GameOfLifeRedo
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.None;
             g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.Low;
             g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighSpeed;
+            //ControlPaint.DrawFocusRectangle(g, new Rectangle(50, 50, 100, 100),Color.Green,Color.Black);
 
         }
 
@@ -163,12 +175,13 @@ namespace GameOfLifeRedo
             return result;
             
         }
+      
         private void ResetGame()
         {
             PauseGame();
             gamehasstarted = false;
             isalive = new bool[cell_count_x * cell_count_y];
-            
+            isselectedbycopy = new bool[cell_count_x * cell_count_y];
             hasaliveneighbors = new bool[cell_count_x * cell_count_y];
             aliveneighbors_count = new byte[cell_count_x * cell_count_y];
             bytegrid = new byte[cell_count_x * cell_count_y];
@@ -204,7 +217,7 @@ namespace GameOfLifeRedo
             }
             bytegrid = new byte[cell_count_x * cell_count_y];
 
-
+            isselectedbycopy = new bool[cell_count_x * cell_count_y];
             isalive = new bool[cell_count_x * cell_count_y];
             hasaliveneighbors = new bool[cell_count_x * cell_count_y];
             aliveneighbors_count = new byte[cell_count_x * cell_count_y];
@@ -239,6 +252,7 @@ namespace GameOfLifeRedo
 
         private void button1_Click(object sender, EventArgs e)
         {
+            
             //InitVariables();
             //AdjustWinFrame();
 
@@ -600,7 +614,7 @@ namespace GameOfLifeRedo
                             bytegrid_new[i]++;
 
                         }
-
+                        
                     }
                     else //enough to survive
                     {
@@ -618,15 +632,38 @@ namespace GameOfLifeRedo
 
         private void GridPanel_MouseDown(object sender, MouseEventArgs e)
         {
-            for(int i = 0; i< cell_count_x*cell_count_y; i++)
-            {
-                if(e.Location.X >= rect_grid[i].Location.X && e.Location.Y >= rect_grid[i].Location.Y)
+            mouseDown = true;
+            mousePoint = mouseDownPoint = e.Location;
+            if (e.Button == MouseButtons.Left) {
+                
+                for (int i = 0; i < cell_count_x * cell_count_y; i++)
                 {
-                    if (e.Location.X <= rect_grid[i].Location.X + sizeofcell && e.Location.Y <= rect_grid[i].Location.Y + sizeofcell)
-                        RectClick(i);
+                    if (mousePoint.X >= rect_grid[i].Location.X && mousePoint.Y >= rect_grid[i].Location.Y)
+                    {
+                        if (mousePoint.X <= rect_grid[i].Location.X + sizeofcell && mousePoint.Y <= rect_grid[i].Location.Y + sizeofcell)
+                        {
+                            mouseDownRectangleNumber = i;
+                            if (!kopieren)
+                            {
+                                RectClick(i);
+                            }
+                           
+                        }
+                                
+                    }
                 }
+                
             }
         }
+        
+        private Rectangle NewRectangleByPoints(Point p1, Point p2) //nehme an dass width und height neg sein können
+        {
+
+            return new Rectangle(p1,new Size(p2.X - p1.X, p2.Y - p1.Y));
+        }
+        
+
+        
         private void ModifiedButtonIncGeneralized(int gnumber, int numberoftimes)
         {
             for (int i = 0; i < numberoftimes; i++)
@@ -870,7 +907,7 @@ namespace GameOfLifeRedo
             }
             bytegrid = new byte[cell_count_x * cell_count_y];
 
-
+            isselectedbycopy = new bool[cell_count_x * cell_count_y];
             isalive = new bool[cell_count_x * cell_count_y];
             hasaliveneighbors = new bool[cell_count_x * cell_count_y];
             aliveneighbors_count = new byte[cell_count_x * cell_count_y];
@@ -1033,7 +1070,83 @@ namespace GameOfLifeRedo
         private void Checkpunkt_MenuItem_Click(object sender, EventArgs e)
         {
             gamestate = GetCurrentGameState();
+            
         }
+
+        private void Kopieren_menuItem_Click(object sender, EventArgs e)
+        {
+            kopieren = true;
+            Start_Button.Enabled = false;
+            Information_groupBox.Show();
+            Information_TextBox.Text = "Abbrechen: ESC";
+        }
+
+        private void Form1_ResizeBegin(object sender, EventArgs e)
+        {
+            //this.SuspendLayout();
+        }
+
+        private void Form1_ResizeEnd(object sender, EventArgs e)
+        {
+            //this.ResumeLayout();
+        }
+
+       
+
+
+        private void kopieren_button_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void Einfügen_menuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void GridColorFlowPanel_MouseUp(object sender, MouseEventArgs e)
+        {
+            mouseDown = false;
+        }
+
+        private void GridColorFlowPanel_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (mouseDown && kopieren)
+            {
+                mousePoint = e.Location;
+                int r_end = 0;
+                int diff_x = mousePoint.X - mouseDownPoint.X;
+                int diff_y = mousePoint.Y - mouseDownPoint.Y;
+                
+                int diffnumberx;
+                int diffnumbery;
+                int diffbuttonx;
+                int diffbuttony;
+
+                
+                    diffnumberx = (diff_x / (sizeofcell + 1));
+                    diffbuttonx = mouseDownRectangleNumber + diffnumberx;
+                    if (diff_y >= 0)
+                    {
+                        diffnumbery = (diff_y / (sizeofcell + 1));
+                        diffbuttony = mouseDownRectangleNumber + diffnumbery;
+                        r_end = mouseDownRectangleNumber + diffnumberx + diffnumbery;
+                        for (int i = 0; i <= diffnumbery; i++)
+                        {
+                            for (int j = 0; j <= diffnumberx; j++)
+                            {
+                                g.FillRectangle(full_black, rect_grid[mouseDownRectangleNumber + j + i*cell_count_x]);
+                            }
+                        }
+                    }
+
+                
+                
+            }
+
+        }
+
+       
 
         private void BytegridChangeAction()
         {

@@ -32,6 +32,9 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.GridColorFlowPanel = new System.Windows.Forms.FlowLayoutPanel();
             this.PanelBottom = new System.Windows.Forms.Panel();
+            this.kopieren_button = new System.Windows.Forms.Button();
+            this.Information_groupBox = new System.Windows.Forms.GroupBox();
+            this.Information_TextBox = new System.Windows.Forms.RichTextBox();
             this.Vorlagenname_label = new System.Windows.Forms.Label();
             this.ElapsedTime = new System.Windows.Forms.Label();
             this.GroupBoxVersionChange = new System.Windows.Forms.GroupBox();
@@ -56,6 +59,9 @@
             this.VorlageSpeichern_MenuItem = new System.Windows.Forms.MenuItem();
             this.AnfangsZustand_MenuItem = new System.Windows.Forms.MenuItem();
             this.Checkpunkt_MenuItem = new System.Windows.Forms.MenuItem();
+            this.menuItem2 = new System.Windows.Forms.MenuItem();
+            this.Kopieren_menuItem = new System.Windows.Forms.MenuItem();
+            this.Einfügen_menuItem = new System.Windows.Forms.MenuItem();
             this.Vorlagen_menuItem = new System.Windows.Forms.MenuItem();
             this.menuItem5 = new System.Windows.Forms.MenuItem();
             this.menuItem6 = new System.Windows.Forms.MenuItem();
@@ -63,6 +69,7 @@
             this.menuItem8 = new System.Windows.Forms.MenuItem();
             this.Regeln_anpassen_menu_down = new System.Windows.Forms.MenuItem();
             this.PanelBottom.SuspendLayout();
+            this.Information_groupBox.SuspendLayout();
             this.GroupBoxVersionChange.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.DecBelow)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.DecAbove)).BeginInit();
@@ -82,10 +89,14 @@
             this.GridColorFlowPanel.SizeChanged += new System.EventHandler(this.GridColorSizeChanged);
             this.GridColorFlowPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.GridColorFlowPanel_Paint);
             this.GridColorFlowPanel.MouseDown += new System.Windows.Forms.MouseEventHandler(this.GridPanel_MouseDown);
+            this.GridColorFlowPanel.MouseMove += new System.Windows.Forms.MouseEventHandler(this.GridColorFlowPanel_MouseMove);
+            this.GridColorFlowPanel.MouseUp += new System.Windows.Forms.MouseEventHandler(this.GridColorFlowPanel_MouseUp);
             // 
             // PanelBottom
             // 
             this.PanelBottom.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.PanelBottom.Controls.Add(this.kopieren_button);
+            this.PanelBottom.Controls.Add(this.Information_groupBox);
             this.PanelBottom.Controls.Add(this.Vorlagenname_label);
             this.PanelBottom.Controls.Add(this.ElapsedTime);
             this.PanelBottom.Controls.Add(this.GroupBoxVersionChange);
@@ -103,6 +114,34 @@
             this.PanelBottom.Name = "PanelBottom";
             this.PanelBottom.Size = new System.Drawing.Size(1904, 190);
             this.PanelBottom.TabIndex = 1;
+            // 
+            // kopieren_button
+            // 
+            this.kopieren_button.Location = new System.Drawing.Point(138, 155);
+            this.kopieren_button.Name = "kopieren_button";
+            this.kopieren_button.Size = new System.Drawing.Size(75, 23);
+            this.kopieren_button.TabIndex = 17;
+            this.kopieren_button.Text = "Kopieren";
+            this.kopieren_button.UseVisualStyleBackColor = true;
+            this.kopieren_button.Click += new System.EventHandler(this.kopieren_button_Click);
+            // 
+            // Information_groupBox
+            // 
+            this.Information_groupBox.Controls.Add(this.Information_TextBox);
+            this.Information_groupBox.Location = new System.Drawing.Point(0, 123);
+            this.Information_groupBox.Name = "Information_groupBox";
+            this.Information_groupBox.Size = new System.Drawing.Size(132, 67);
+            this.Information_groupBox.TabIndex = 16;
+            this.Information_groupBox.TabStop = false;
+            this.Information_groupBox.Visible = false;
+            // 
+            // Information_TextBox
+            // 
+            this.Information_TextBox.Location = new System.Drawing.Point(0, 9);
+            this.Information_TextBox.Name = "Information_TextBox";
+            this.Information_TextBox.Size = new System.Drawing.Size(126, 58);
+            this.Information_TextBox.TabIndex = 0;
+            this.Information_TextBox.Text = "";
             // 
             // Vorlagenname_label
             // 
@@ -274,7 +313,7 @@
             // 
             // Start_Button
             // 
-            this.Start_Button.Location = new System.Drawing.Point(3, 72);
+            this.Start_Button.Location = new System.Drawing.Point(12, 72);
             this.Start_Button.Name = "Start_Button";
             this.Start_Button.Size = new System.Drawing.Size(124, 32);
             this.Start_Button.TabIndex = 1;
@@ -301,6 +340,7 @@
             // 
             this.mainMenu1.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
             this.menuItem1,
+            this.menuItem2,
             this.Vorlagen_menuItem,
             this.menuItem5,
             this.menuItem8});
@@ -339,14 +379,34 @@
             this.Checkpunkt_MenuItem.Text = "Checkpunkt setzen";
             this.Checkpunkt_MenuItem.Click += new System.EventHandler(this.Checkpunkt_MenuItem_Click);
             // 
+            // menuItem2
+            // 
+            this.menuItem2.Index = 1;
+            this.menuItem2.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.Kopieren_menuItem,
+            this.Einfügen_menuItem});
+            this.menuItem2.Text = "Bearbeiten";
+            // 
+            // Kopieren_menuItem
+            // 
+            this.Kopieren_menuItem.Index = 0;
+            this.Kopieren_menuItem.Text = "Kopieren";
+            this.Kopieren_menuItem.Click += new System.EventHandler(this.Kopieren_menuItem_Click);
+            // 
+            // Einfügen_menuItem
+            // 
+            this.Einfügen_menuItem.Index = 1;
+            this.Einfügen_menuItem.Text = "Einfügen";
+            this.Einfügen_menuItem.Click += new System.EventHandler(this.Einfügen_menuItem_Click);
+            // 
             // Vorlagen_menuItem
             // 
-            this.Vorlagen_menuItem.Index = 1;
+            this.Vorlagen_menuItem.Index = 2;
             this.Vorlagen_menuItem.Text = "Vorlagen";
             // 
             // menuItem5
             // 
-            this.menuItem5.Index = 2;
+            this.menuItem5.Index = 3;
             this.menuItem5.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
             this.menuItem6,
             this.menuItem7});
@@ -364,7 +424,7 @@
             // 
             // menuItem8
             // 
-            this.menuItem8.Index = 3;
+            this.menuItem8.Index = 4;
             this.menuItem8.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
             this.Regeln_anpassen_menu_down});
             this.menuItem8.Text = "Version";
@@ -388,8 +448,11 @@
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "Game of Life by Tim E";
+            this.ResizeBegin += new System.EventHandler(this.Form1_ResizeBegin);
+            this.ResizeEnd += new System.EventHandler(this.Form1_ResizeEnd);
             this.PanelBottom.ResumeLayout(false);
             this.PanelBottom.PerformLayout();
+            this.Information_groupBox.ResumeLayout(false);
             this.GroupBoxVersionChange.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.DecBelow)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.DecAbove)).EndInit();
@@ -433,6 +496,12 @@
         private System.Windows.Forms.MenuItem VorlageSpeichern_MenuItem;
         private System.Windows.Forms.MenuItem Checkpunkt_MenuItem;
         private System.Windows.Forms.MenuItem AnfangsZustand_MenuItem;
+        private System.Windows.Forms.MenuItem menuItem2;
+        private System.Windows.Forms.MenuItem Kopieren_menuItem;
+        private System.Windows.Forms.MenuItem Einfügen_menuItem;
+        private System.Windows.Forms.GroupBox Information_groupBox;
+        private System.Windows.Forms.RichTextBox Information_TextBox;
+        private System.Windows.Forms.Button kopieren_button;
     }
 }
 
