@@ -29,6 +29,8 @@ namespace GameOfLifeRedo
         int mouseDownRectangleNumber = 0;
         Point mousePoint = Point.Empty;
         bool[] isselectedbycopy;
+        int last_selectedbycopy_top_left;
+        int last_selectedbycopy_bottom_right;
 
 
         Graphics g = null;
@@ -558,8 +560,8 @@ namespace GameOfLifeRedo
 
         private void GridColorFlowPanel_Paint(object sender, PaintEventArgs e)
         {
-
-
+            
+            
             InitLineGrid();
             // e.Graphics.TranslateTransform(GridColorFlowPanel.AutoScrollPosition.X, GridColorFlowPanel.AutoScrollPosition.Y);
         }
@@ -634,6 +636,7 @@ namespace GameOfLifeRedo
         {
             mouseDown = true;
             mousePoint = mouseDownPoint = e.Location;
+
             if (e.Button == MouseButtons.Left) {
                 
                 for (int i = 0; i < cell_count_x * cell_count_y; i++)
@@ -647,7 +650,8 @@ namespace GameOfLifeRedo
                             {
                                 RectClick(i);
                             }
-                           
+                            else mouseDownPoint = rect_grid[mouseDownRectangleNumber].Location;
+
                         }
                                 
                     }
@@ -962,9 +966,9 @@ namespace GameOfLifeRedo
                 return new SolidBrush(Color.FromArgb(128, 128, 128));
             if (gnumber == 3)
                 return new SolidBrush(Color.FromArgb(64, 64, 64));
-            if (gnumber == 4)
+            else
                 return new SolidBrush(Color.FromArgb(0, 0, 0));
-            else return null;
+            
         }
         private void ManualTick_Button_Click(object sender, EventArgs e)
         {
@@ -1107,46 +1111,88 @@ namespace GameOfLifeRedo
         private void GridColorFlowPanel_MouseUp(object sender, MouseEventArgs e)
         {
             mouseDown = false;
+
         }
 
         private void GridColorFlowPanel_MouseMove(object sender, MouseEventArgs e)
         {
-            if (mouseDown && kopieren)
+            if (mouseDown && kopieren && e.Location.X > GridColorFlowPanel.ClientRectangle.Left && e.Location.X < GridColorFlowPanel.ClientRectangle.Right && e.Location.Y > GridColorFlowPanel.ClientRectangle.Top && e.Location.Y < GridColorFlowPanel.ClientRectangle.Bottom - PanelBottom.Height)
             {
                 mousePoint = e.Location;
-                int r_end = 0;
-                int diff_x = mousePoint.X - mouseDownPoint.X;
-                int diff_y = mousePoint.Y - mouseDownPoint.Y;
-                
-                int diffnumberx;
-                int diffnumbery;
-                int diffbuttonx;
-                int diffbuttony;
 
                 
-                    diffnumberx = (diff_x / (sizeofcell + 1));
-                    diffbuttonx = mouseDownRectangleNumber + diffnumberx;
-                    if (diff_y >= 0)
+                int diffnumberx = (mousePoint.X - mouseDownPoint.X) / (sizeofcell + 1);
+                int diffnumbery = (mousePoint.Y - mouseDownPoint.Y) / (sizeofcell + 1);
+                
+                if (diffnumberx < 0 || ((mousePoint.X - mouseDownPoint.X < 0 && mousePoint.X - mouseDownPoint.X > -(sizeofcell + 1))))
+                    diffnumberx--;
+                if (diffnumbery < 0 || (mousePoint.Y - mouseDownPoint.Y < 0 && mousePoint.Y - mouseDownPoint.Y > -(sizeofcell + 1)))
+                    diffnumbery--;
+                
+                if (mouseDownRectangleNumber + diffnumberx + diffnumbery * cell_count_x < 0)
+                {
+                    diffnumbery++;
+                }
+                int bo_ri = mouseDownRectangleNumber + diffnumberx + diffnumbery*cell_count_x;
+                int to_ri = mouseDownRectangleNumber + diffnumberx;
+                int bo_le = mouseDownRectangleNumber + diffnumbery * cell_count_x;
+                
+                int true_to_le = (new int[] { mouseDownRectangleNumber, to_ri, bo_le, bo_ri }).Min();
+                
+
+                int true_bo_ri = (new int[] { mouseDownRectangleNumber, to_ri, bo_le, bo_ri }).Max();
+
+                for (int i = 0; i < cell_count_x*cell_count_y; i++)
+                {
+                    if (isselectedbycopy[i])
                     {
-                        diffnumbery = (diff_y / (sizeofcell + 1));
-                        diffbuttony = mouseDownRectangleNumber + diffnumbery;
-                        r_end = mouseDownRectangleNumber + diffnumberx + diffnumbery;
-                        for (int i = 0; i <= diffnumbery; i++)
+                        if (!((i % cell_count_x >= true_to_le % cell_count_x && i % cell_count_x <= true_bo_ri % cell_count_x) && i >= last_selectedbycopy_top_left && i <= last_selectedbycopy_bottom_right))
                         {
-                            for (int j = 0; j <= diffnumberx; j++)
-                            {
-                                g.FillRectangle(full_black, rect_grid[mouseDownRectangleNumber + j + i*cell_count_x]);
-                            }
+                            isselectedbycopy[i] = false; ;
+                            g.FillRectangle(ByteToBrush(bytegrid[i]), rect_grid[i]);
                         }
                     }
+                }
 
+                for (int i = 0; i <= Math.Abs(diffnumbery); i++)
+                {
+                    for (int j = 0; j <= Math.Abs(diffnumberx); j++)
+                    {
+                        int gnumber = true_to_le + j + i * cell_count_x;
+                        if (!isselectedbycopy[gnumber])
+                        {
+                            isselectedbycopy[gnumber] = true;
+                            g.FillRectangle(SelectBrushChange((byte)(bytegrid[gnumber])), rect_grid[gnumber]);
+                        }
+                        
+                    }
+                }
                 
+
+
+                last_selectedbycopy_top_left = true_to_le;
+                last_selectedbycopy_bottom_right = true_bo_ri;
                 
             }
 
         }
+        private Brush SelectBrushChange(int gnumber)
+        {
+            if (gnumber == 0)
+                return new SolidBrush(Color.FromArgb(192, 192, 255));
+            if (gnumber == 1)
+                return new SolidBrush(Color.FromArgb(144, 144, 255));
+            if (gnumber == 2)
+                return new SolidBrush(Color.FromArgb(96, 96, 192));
+            if (gnumber == 3)
+                return new SolidBrush(Color.FromArgb(48, 48, 128));
+            else
+                return new SolidBrush(Color.FromArgb(0, 0, 64));
+        }
+        private void menuItem6_Click(object sender, EventArgs e)
+        {
 
-       
+        }
 
         private void BytegridChangeAction()
         {
