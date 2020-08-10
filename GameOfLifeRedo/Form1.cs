@@ -23,15 +23,21 @@ namespace GameOfLifeRedo
         readonly Brush mygrey3 = new SolidBrush(Color.FromArgb(64, 64, 64));
         readonly Brush full_black = new SolidBrush(Color.FromArgb(0, 0, 0));
         const int placeforinformation = 10;
-        bool kopieren = false;
+        bool copyisinAuswahl = false;
+        bool copyisinEinfueg = false;
+        byte[,] copiedbytes = null;
         bool mouseDown;
-        Point mouseDownPoint = Point.Empty;
+        Point mouseDownPoint;
         int mouseDownRectangleNumber = 0;
         Point mousePoint = Point.Empty;
         bool[] isselectedbycopy;
         int last_selectedbycopy_top_left;
         int last_selectedbycopy_bottom_right;
-
+        byte[] currentbytegrid_on_screen_for_copy;
+        
+        int[,] correspondingarraynumbers;
+        int last_correspondingarraynumbers_topleft = -1;
+        int last_correspondingarraynumbers_bottomright = -1;
 
         Graphics g = null;
         
@@ -56,7 +62,7 @@ namespace GameOfLifeRedo
         
 
         static int cell_count_x, cell_count_y;
-        public int sizeofcell = 15;
+        public int sizeofcell = 7;
         public struct GameState
         {
             public int generationcounter;
@@ -65,7 +71,7 @@ namespace GameOfLifeRedo
             public int sizeofcell;
             public bool gameexists;
             public DateTime time_start;
-            public Rectangle[] rect_grid;        
+            public Rectangle[] rect_grid;    
             public byte[] bytegrid;
             public byte[] bytegrid_new;
             public bool[] bytegrid_haschanged;
@@ -190,6 +196,7 @@ namespace GameOfLifeRedo
             bytegrid_new=new byte[cell_count_x * cell_count_y];
             bytegrid_haschanged=new bool[cell_count_x * cell_count_y];
             neighbors_gradient_sum = new byte[cell_count_x * cell_count_y];
+            currentbytegrid_on_screen_for_copy = new byte[cell_count_x * cell_count_y];
             GridColorFlowPanel.Refresh();
             generationcounter = 0;
             Generation_Ctr_Label.Text = "0";
@@ -218,7 +225,7 @@ namespace GameOfLifeRedo
                 }
             }
             bytegrid = new byte[cell_count_x * cell_count_y];
-
+            currentbytegrid_on_screen_for_copy = new byte[cell_count_x * cell_count_y];
             isselectedbycopy = new bool[cell_count_x * cell_count_y];
             isalive = new bool[cell_count_x * cell_count_y];
             hasaliveneighbors = new bool[cell_count_x * cell_count_y];
@@ -489,6 +496,7 @@ namespace GameOfLifeRedo
                         sumgrey3++;
                     else
                         sumblack++;
+                    currentbytegrid_on_screen_for_copy[i] = bytegrid[i];
                 }
             }
             int whitecount = 0;
@@ -632,39 +640,61 @@ namespace GameOfLifeRedo
             UpdateColorAll();
         }
 
+        //private void OLDGridPanel_MouseDown(object sender, MouseEventArgs e)
+        //{
+        //    mouseDown = true;
+        //    mousePoint = mouseDownPoint = e.Location;
+
+        //    if (e.Button == MouseButtons.Left) {
+
+        //        for (int i = 0; i < cell_count_x * cell_count_y; i++)
+        //        {
+        //            if (mousePoint.X >= rect_grid[i].Location.X && mousePoint.Y >= rect_grid[i].Location.Y)
+        //            {
+        //                if (mousePoint.X <= rect_grid[i].Location.X + sizeofcell && mousePoint.Y <= rect_grid[i].Location.Y + sizeofcell)
+        //                {
+        //                    mouseDownRectangleNumber = i;
+        //                    if (!copyisinAuswahl)
+        //                    {
+        //                        RectClick(i);
+        //                    }
+
+
+        //                }
+
+        //            }
+        //        }
+
+        //    }
+        //}
         private void GridPanel_MouseDown(object sender, MouseEventArgs e)
         {
             mouseDown = true;
             mousePoint = mouseDownPoint = e.Location;
 
-            if (e.Button == MouseButtons.Left) {
-                
-                for (int i = 0; i < cell_count_x * cell_count_y; i++)
-                {
-                    if (mousePoint.X >= rect_grid[i].Location.X && mousePoint.Y >= rect_grid[i].Location.Y)
-                    {
-                        if (mousePoint.X <= rect_grid[i].Location.X + sizeofcell && mousePoint.Y <= rect_grid[i].Location.Y + sizeofcell)
-                        {
-                            mouseDownRectangleNumber = i;
-                            if (!kopieren)
-                            {
-                                RectClick(i);
-                            }
-                            else mouseDownPoint = rect_grid[mouseDownRectangleNumber].Location;
+            if (e.Button == MouseButtons.Left)
+            {
 
-                        }
-                                
-                    }
+                int rect_x = (mousePoint.X -1) / (sizeofcell + 1);
+                int rect_y = (mousePoint.Y -1) / (sizeofcell + 1);
+
+                mouseDownRectangleNumber = rect_x + rect_y * cell_count_x;
+                if (!copyisinAuswahl&&!copyisinEinfueg)
+                {
+                    RectClick(mouseDownRectangleNumber);
                 }
-                
+
+
+
+
+
+
+
             }
         }
-        
-        private Rectangle NewRectangleByPoints(Point p1, Point p2) //nehme an dass width und height neg sein können
-        {
 
-            return new Rectangle(p1,new Size(p2.X - p1.X, p2.Y - p1.Y));
-        }
+        private Rectangle NewRectangleByPoints(Point p1, Point p2) => new Rectangle(new Point(Math.Min(p1.X,p2.X), Math.Min(p2.Y,p1.Y)), new Size(Math.Abs(p2.X - p1.X), Math.Abs(p2.Y - p1.Y)));
+
         
 
         
@@ -701,6 +731,7 @@ namespace GameOfLifeRedo
                 g.FillRectangle(mygrey1, rect_grid[gnumber]);
                 bytegrid[gnumber] = 1;
                 bytegrid_new[gnumber] = 1;
+                currentbytegrid_on_screen_for_copy[gnumber] = 1;
                 ModifiedButtonIncGeneralized(gnumber);
             }
             else if (bytegrid[gnumber] == 1)
@@ -708,6 +739,7 @@ namespace GameOfLifeRedo
                 g.FillRectangle(mygrey2, rect_grid[gnumber]);
                 bytegrid[gnumber] = 2;
                 bytegrid_new[gnumber] = 2;
+                currentbytegrid_on_screen_for_copy[gnumber] = 2;
                 ModifiedButtonIncGeneralized(gnumber);
 
             }
@@ -716,7 +748,7 @@ namespace GameOfLifeRedo
                 g.FillRectangle(mygrey3, rect_grid[gnumber]);
                 bytegrid[gnumber] = 3;
                 bytegrid_new[gnumber] = 3;
-               
+                currentbytegrid_on_screen_for_copy[gnumber] = 3;
                 ModifiedButtonIncGeneralized(gnumber);
 
             }
@@ -725,7 +757,7 @@ namespace GameOfLifeRedo
                 g.FillRectangle(full_black, rect_grid[gnumber]);
                 bytegrid[gnumber] = 4;
                 bytegrid_new[gnumber] = 4;
-               
+                currentbytegrid_on_screen_for_copy[gnumber] = 4;
                 ModifiedButtonIncGeneralized(gnumber);
 
             }
@@ -734,7 +766,7 @@ namespace GameOfLifeRedo
                 g.FillRectangle(dead_white, rect_grid[gnumber]);
                 bytegrid[gnumber] = 0;
                 bytegrid_new[gnumber] = 0;
-                
+                currentbytegrid_on_screen_for_copy[gnumber] = 0;
                 AliveNeighborsDecBool(gnumber);
                 isalive[gnumber] = false;
                 for (int i = 0; i < 4; i++)
@@ -1079,7 +1111,7 @@ namespace GameOfLifeRedo
 
         private void Kopieren_menuItem_Click(object sender, EventArgs e)
         {
-            kopieren = true;
+            copyisinAuswahl = true;
             Start_Button.Enabled = false;
             Information_groupBox.Show();
             Information_TextBox.Text = "Abbrechen: ESC";
@@ -1100,6 +1132,67 @@ namespace GameOfLifeRedo
 
         private void kopieren_button_Click(object sender, EventArgs e)
         {
+            
+            for(int i = last_selectedbycopy_top_left; i <= last_selectedbycopy_bottom_right; i++)
+            {
+                if (isselectedbycopy[i])
+                {
+                    g.FillRectangle(ByteToBrush(bytegrid[i]), rect_grid[i]);
+                }
+            }
+            copiedbytes = CutSectionFromArray(bytegrid, last_selectedbycopy_top_left, last_selectedbycopy_bottom_right, cell_count_x);
+            copyisinEinfueg = true;
+            copyisinAuswahl = false;
+        }
+        
+        
+        private T[,] CutSectionFromArray<T>(T[] wholearray, int indexelement, int lastelement, int len_x_of_wholearray)
+        {
+            if (wholearray.Length % len_x_of_wholearray != 0)
+                throw new ArgumentException("Parameter is not divisible by len_x_of_whole_array.", "wholearray.Length");
+            int len_x_new = lastelement % len_x_of_wholearray - indexelement % len_x_of_wholearray + 1;
+            int len_y_new = ((lastelement - (indexelement + len_x_new - 1)) / len_x_of_wholearray) + 1;
+
+            T[,] new_array = new T[len_y_new,len_x_new];
+
+            
+            for (int i = 0; i < len_y_new; i++)
+            {
+                for (int j = 0; j < len_x_new; j++)
+                {
+
+                    new_array[i, j] = wholearray[indexelement + j + i * len_x_of_wholearray];
+                }
+            }
+            return new_array;
+
+
+
+        }
+        private T[,] RotateMatrix<T>(T[,] md_array, int timesninetydegreesright) //Laufzeit ignorieren. Mir war nur wichtig dass ich mal wieder rekursiv arbeite und <T>
+        {
+            T[,] new_array;
+            if (timesninetydegreesright == 0)
+                return md_array;
+            if (timesninetydegreesright >= 4) return RotateMatrix(md_array, timesninetydegreesright % 4);
+            else
+            {
+                
+                int oldarray_leny = md_array.GetLength(0);
+                int oldarray_lenx = md_array.GetLength(1);
+                
+                new_array = new T[oldarray_lenx, oldarray_leny];
+                for(int i = 0; i < oldarray_lenx; i++)
+                {
+                    for(int j = 0; j< oldarray_leny; j++)
+                    {
+                        new_array[i, j] = md_array[ oldarray_leny - j-1, i];
+                    }
+                }
+            }
+            return RotateMatrix(new_array, timesninetydegreesright - 1);
+
+
 
         }
 
@@ -1116,65 +1209,234 @@ namespace GameOfLifeRedo
 
         private void GridColorFlowPanel_MouseMove(object sender, MouseEventArgs e)
         {
-            if (mouseDown && kopieren && e.Location.X > GridColorFlowPanel.ClientRectangle.Left && e.Location.X < GridColorFlowPanel.ClientRectangle.Right && e.Location.Y > GridColorFlowPanel.ClientRectangle.Top && e.Location.Y < GridColorFlowPanel.ClientRectangle.Bottom - PanelBottom.Height)
+            if (mouseDown)
             {
-                mousePoint = e.Location;
-
                 
-                int diffnumberx = (mousePoint.X - mouseDownPoint.X) / (sizeofcell + 1);
-                int diffnumbery = (mousePoint.Y - mouseDownPoint.Y) / (sizeofcell + 1);
-                
-                if (diffnumberx < 0 || ((mousePoint.X - mouseDownPoint.X < 0 && mousePoint.X - mouseDownPoint.X > -(sizeofcell + 1))))
-                    diffnumberx--;
-                if (diffnumbery < 0 || (mousePoint.Y - mouseDownPoint.Y < 0 && mousePoint.Y - mouseDownPoint.Y > -(sizeofcell + 1)))
-                    diffnumbery--;
-                
-                if (mouseDownRectangleNumber + diffnumberx + diffnumbery * cell_count_x < 0)
+                if (copyisinAuswahl && e.Location.X > GridColorFlowPanel.ClientRectangle.Left && e.Location.X < GridColorFlowPanel.ClientRectangle.Right && e.Location.Y > GridColorFlowPanel.ClientRectangle.Top && e.Location.Y < GridColorFlowPanel.ClientRectangle.Bottom - PanelBottom.Height) //doppelte bedignungen für beide copy beabsichtigt
                 {
-                    diffnumbery++;
-                }
-                int bo_ri = mouseDownRectangleNumber + diffnumberx + diffnumbery*cell_count_x;
-                int to_ri = mouseDownRectangleNumber + diffnumberx;
-                int bo_le = mouseDownRectangleNumber + diffnumbery * cell_count_x;
-                
-                int true_to_le = (new int[] { mouseDownRectangleNumber, to_ri, bo_le, bo_ri }).Min();
-                
+                    mousePoint = e.Location;
 
-                int true_bo_ri = (new int[] { mouseDownRectangleNumber, to_ri, bo_le, bo_ri }).Max();
+                    Point tmp_mouseDownPoint = rect_grid[mouseDownRectangleNumber].Location;
 
-                for (int i = 0; i < cell_count_x*cell_count_y; i++)
-                {
-                    if (isselectedbycopy[i])
+                    int diffnumberx = (mousePoint.X - tmp_mouseDownPoint.X) / (sizeofcell + 1);
+                    int diffnumbery = (mousePoint.Y - tmp_mouseDownPoint.Y) / (sizeofcell + 1);
+
+                    if (diffnumberx < 0 && !(diffnumberx + mouseDownRectangleNumber % cell_count_x == 0) || (mousePoint.X - tmp_mouseDownPoint.X < 0 && mousePoint.X - tmp_mouseDownPoint.X > -(sizeofcell + 1)))
+                        diffnumberx--;
+                    if (diffnumbery < 0 || (mousePoint.Y - tmp_mouseDownPoint.Y < 0 && mousePoint.Y - tmp_mouseDownPoint.Y > -(sizeofcell + 1)))
+                        diffnumbery--;
+
+                    if (mouseDownRectangleNumber + diffnumberx + diffnumbery * cell_count_x < 0)
                     {
-                        if (!((i % cell_count_x >= true_to_le % cell_count_x && i % cell_count_x <= true_bo_ri % cell_count_x) && i >= last_selectedbycopy_top_left && i <= last_selectedbycopy_bottom_right))
+                        diffnumbery++;
+                    }
+                    int bo_ri = mouseDownRectangleNumber + diffnumberx + diffnumbery * cell_count_x;
+                    int to_ri = mouseDownRectangleNumber + diffnumberx;
+                    int bo_le = mouseDownRectangleNumber + diffnumbery * cell_count_x;
+                    int true_to_le = (new int[] { mouseDownRectangleNumber, to_ri, bo_le, bo_ri }).Min();
+                    int true_bo_ri = (new int[] { mouseDownRectangleNumber, to_ri, bo_le, bo_ri }).Max();
+
+                    for (int i = 0; i < cell_count_x * cell_count_y; i++)
+                    {
+                        if (isselectedbycopy[i])
                         {
-                            isselectedbycopy[i] = false; ;
-                            g.FillRectangle(ByteToBrush(bytegrid[i]), rect_grid[i]);
+                            if (!((i % cell_count_x >= true_to_le % cell_count_x && i % cell_count_x <= true_bo_ri % cell_count_x) && i >= last_selectedbycopy_top_left && i <= last_selectedbycopy_bottom_right))
+                            {
+                                isselectedbycopy[i] = false;
+                                
+                                    g.FillRectangle(ByteToBrush(bytegrid[i]), rect_grid[i]);
+                                    
+                                
+                            }
                         }
                     }
-                }
-
-                for (int i = 0; i <= Math.Abs(diffnumbery); i++)
-                {
-                    for (int j = 0; j <= Math.Abs(diffnumberx); j++)
+                    for (int i = 0; i <= Math.Abs(diffnumbery); i++)
                     {
-                        int gnumber = true_to_le + j + i * cell_count_x;
-                        if (!isselectedbycopy[gnumber])
+                        for (int j = 0; j <= Math.Abs(diffnumberx); j++)
                         {
-                            isselectedbycopy[gnumber] = true;
-                            g.FillRectangle(SelectBrushChange((byte)(bytegrid[gnumber])), rect_grid[gnumber]);
+                            int gnumber = true_to_le + j + i * cell_count_x;
+                            if (!isselectedbycopy[gnumber])
+                            {
+                                isselectedbycopy[gnumber] = true;
+                                
+                                g.FillRectangle(SelectBrushChange((byte)(bytegrid[gnumber])), rect_grid[gnumber]);
+                            }
                         }
-                        
                     }
+                    last_selectedbycopy_top_left = true_to_le;
+                    last_selectedbycopy_bottom_right = true_bo_ri;
                 }
-                
-
-
-                last_selectedbycopy_top_left = true_to_le;
-                last_selectedbycopy_bottom_right = true_bo_ri;
                 
             }
+            else if (copyisinEinfueg && e.Location.X > GridColorFlowPanel.ClientRectangle.Left && e.Location.X < GridColorFlowPanel.ClientRectangle.Right && e.Location.Y > GridColorFlowPanel.ClientRectangle.Top && e.Location.Y < GridColorFlowPanel.ClientRectangle.Bottom - PanelBottom.Height) //doppelt beabsichtigt für laufzeit
+            {
+                
+                mousePoint = e.Location;    
+                int rect_x = (mousePoint.X - 1) / (sizeofcell + 1);
+                int rect_y = (mousePoint.Y - 1) / (sizeofcell + 1);
+                int gnumber = rect_x + rect_y * cell_count_x;
+                correspondingarraynumbers = FindCorrespondingArrayNumbers(bytegrid, cell_count_x, copiedbytes, gnumber);
+                int current_correspondingarraynumbers_topleft = correspondingarraynumbers[0, 0];
+                int current_correspondingarraynumbers_bottomright = correspondingarraynumbers[correspondingarraynumbers.GetLength(0) - 1, correspondingarraynumbers.GetLength(1) - 1];
+                if (last_correspondingarraynumbers_topleft != -1 && last_correspondingarraynumbers_bottomright != -1)
+                {
+                    int[] testarr = VennRectangleSetDifferenceWithBorder(current_correspondingarraynumbers_topleft, current_correspondingarraynumbers_bottomright, last_correspondingarraynumbers_topleft, last_correspondingarraynumbers_bottomright, cell_count_x, cell_count_y);
+                    for (int i = 0; i < testarr.Length; i++)
+                    {
+                        
+                        if (currentbytegrid_on_screen_for_copy[testarr[i]] != bytegrid[testarr[i]])
+                        {
+                            g.FillRectangle(ByteToBrush(bytegrid[testarr[i]]), rect_grid[testarr[i]]);
+                            currentbytegrid_on_screen_for_copy[testarr[i]] = bytegrid[testarr[i]];
+                        }
+                    }
+                    
+                }
+                last_correspondingarraynumbers_topleft = current_correspondingarraynumbers_topleft;
+                last_correspondingarraynumbers_bottomright = current_correspondingarraynumbers_bottomright;
+                
 
+                for (int i = 0; i < copiedbytes.GetLength(0); i++)
+                {
+                    for(int j = 0; j < copiedbytes.GetLength(1); j++)
+                    {
+                        if (currentbytegrid_on_screen_for_copy[correspondingarraynumbers[i, j]] != copiedbytes[i, j])
+                        {
+                            g.FillRectangle(ByteToBrush(copiedbytes[i, j]), rect_grid[correspondingarraynumbers[i, j]]);
+                            currentbytegrid_on_screen_for_copy[correspondingarraynumbers[i, j]] = copiedbytes[i, j];
+                        }
+                    }
+                }
+                
+            }
+        }
+        private int[] VennRectangleSetDifferenceWithBorder(int top_left_new, int bottom_right_new, int top_left_old, int bottom_right_old, int cellcountx, int cellcounty)
+        {
+            
+            List<int> a_w_out_b = new List<int>();
+            int relative_x_left_old = top_left_old % cellcountx;
+            int relative_x_right_old = bottom_right_old % cellcountx;
+            int relative_y_up_old = top_left_old / cellcountx;
+            int relative_y_down_old = bottom_right_old / cellcountx;
+
+            int relative_x_left_new = top_left_new % cellcountx;
+            int relative_x_right_new = bottom_right_new % cellcountx;
+            int relative_y_down_new = bottom_right_new / cellcountx;
+            bool borders_south_old = relative_y_up_old > relative_y_down_old;
+            bool borders_east_old = relative_x_left_old > relative_x_right_old;
+
+            for (int i = 0; i<cellcounty; i++)
+            {
+                for(int j = 0; j<cellcountx; j++)
+                {
+                    int gnumber = i * cellcountx + j;
+                    int relative_gnumberx = gnumber % cellcountx;
+                    int relative_gnumbery = gnumber / cellcountx;
+                    if (borders_east_old)
+                    {
+                        if (borders_south_old)
+                        {
+                            if (relative_gnumberx >= relative_x_left_old && relative_gnumbery >= relative_y_up_old)//Bottomright || Logic can be optimized, but left as is for better comprehension
+                            {
+                                if(!IsPointWithinRectangle(gnumber, top_left_new, cellcountx*cellcounty-1, cellcountx))
+                                    a_w_out_b.Add(gnumber);
+                            }
+                            else if (relative_gnumberx <= relative_x_right_old && relative_gnumbery >= relative_y_up_old)//Bottomleft
+                            {
+                                if(!IsPointWithinRectangle(gnumber, top_left_new-top_left_new % cellcountx, cellcountx*cellcounty - cellcountx + bottom_right_new % cellcountx, cellcountx))
+                                    a_w_out_b.Add(gnumber);
+
+                            } 
+                            else if (relative_gnumberx <= relative_x_right_old && relative_gnumbery <= relative_y_down_old)//Topleft
+                            {
+                                if(!IsPointWithinRectangle(gnumber, 0, bottom_right_new, cellcountx))
+                                    a_w_out_b.Add(gnumber);
+                            } 
+                            else if(relative_gnumberx >= relative_x_left_old && relative_gnumbery <= relative_y_down_old) //Topright 
+                            {
+                                if(!IsPointWithinRectangle(gnumber, relative_x_left_new, relative_y_down_new * cellcountx-1, cellcountx))
+                                    a_w_out_b.Add(gnumber);
+                                
+                            }
+                        }
+                        else
+                        {
+                            if (IsWithinRange(relative_gnumbery, relative_y_up_old, relative_y_down_old))
+                            {
+                                if (relative_gnumberx >= relative_x_left_old) //Right
+                                {
+                                    if(!IsPointWithinRectangle(gnumber, top_left_new, relative_y_down_new*cellcountx-1, cellcountx))
+                                        a_w_out_b.Add(gnumber);
+                                }
+                                else if (relative_gnumberx <= relative_x_right_old) //Left
+                                {
+                                    if(!IsPointWithinRectangle(gnumber, top_left_new - top_left_new % cellcountx, bottom_right_new, cellcountx))
+                                        a_w_out_b.Add(gnumber);
+                                }
+                            }
+                            
+                        }
+                    }
+                    else
+                    {
+                        if (borders_south_old)
+                        {
+                            if(relative_gnumberx >= relative_x_left_old && relative_gnumberx <= relative_x_right_old)
+                            {
+                                if(relative_gnumbery >= relative_y_up_old) // Bottom
+                                {
+                                    if(!IsPointWithinRectangle(gnumber, top_left_new, cellcountx*cellcounty + relative_x_right_new, cellcountx))
+                                        a_w_out_b.Add(gnumber);
+                                }
+                                else if(relative_gnumbery <= relative_y_down_old) //Top
+                                {
+                                    if(!IsPointWithinRectangle(gnumber, relative_x_left_new, bottom_right_new, cellcountx))
+                                        a_w_out_b.Add(gnumber);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (IsPointWithinRectangle(gnumber, top_left_old, bottom_right_old, cellcountx)) {
+                                if (!IsPointWithinRectangle(gnumber, top_left_new, bottom_right_new, cellcountx))
+                                    a_w_out_b.Add(gnumber);
+                            }
+                        }
+                    }
+                    
+                }
+            }
+            return a_w_out_b.ToArray();
+        }
+        private bool IsPointWithinRectangle(int gnumber, int topleft, int bottomright, int cellcountx)
+        {
+            return gnumber % cellcountx >= topleft % cellcountx && gnumber % cellcountx <= bottomright % cellcountx && IsWithinRange(gnumber/cellcountx, topleft/cellcountx, bottomright/cellcountx);
+        }
+        private bool IsWithinRange<T>(T i, T from, T to) where T : IComparable<T>
+        {
+            return i.CompareTo(from) >= 0 && i.CompareTo(to) <= 0;
+        }
+        private int[,] FindCorrespondingArrayNumbers<T,T2>(T[] original_arr, int original_len_x, T2[,] section_arr, int top_left_original)
+        {
+            int tmp_left = top_left_original;
+            int[,] new_arr = new int[section_arr.GetLength(0),section_arr.GetLength(1)];
+            
+            for (int i = 0; i < section_arr.GetLength(0); i++)
+            {
+                for (int j = 0; j < section_arr.GetLength(1); j++)
+                {
+                    new_arr[i, j] = GetFarNeighbor(tmp_left, 1, j );
+                }
+                tmp_left = neighbors[tmp_left, 2];
+            }
+            return new_arr;
+        }
+        private int GetFarNeighbor(int gnumber, int direction, int offset)
+        {
+            if (offset == 0)
+                return gnumber;
+            else
+                return GetFarNeighbor(neighbors[gnumber, direction], direction, offset - 1);
         }
         private Brush SelectBrushChange(int gnumber)
         {
@@ -1191,7 +1453,21 @@ namespace GameOfLifeRedo
         }
         private void menuItem6_Click(object sender, EventArgs e)
         {
+            
+        }
 
+        private void GridColorFlowPanel_MouseWheel(object sender, System.Windows.Forms.MouseEventArgs e)
+        {
+            if (e.Delta > 0)
+            {
+                copiedbytes = RotateMatrix(copiedbytes, 3);
+                GridColorFlowPanel_MouseMove(this, e);
+            }
+            else
+            {
+                copiedbytes = RotateMatrix(copiedbytes, 1);
+                GridColorFlowPanel_MouseMove(this, e);
+            }
         }
 
         private void BytegridChangeAction()
@@ -1550,6 +1826,10 @@ namespace GameOfLifeRedo
                 }
 
             }
+            for(int i = 0; i < cell_count_x * cell_count_y; i++)
+            {
+                currentbytegrid_on_screen_for_copy[i] = bytegrid[i];
+            }
         }
         private void Randomize()
         {
@@ -1594,6 +1874,10 @@ namespace GameOfLifeRedo
                     }
 
                 }
+            for (int i = 0; i < cell_count_x * cell_count_y; i++)
+            {
+                currentbytegrid_on_screen_for_copy[i] = bytegrid[i];
+            }
         }
     }
 }

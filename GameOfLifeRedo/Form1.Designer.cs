@@ -91,6 +91,7 @@
             this.GridColorFlowPanel.MouseDown += new System.Windows.Forms.MouseEventHandler(this.GridPanel_MouseDown);
             this.GridColorFlowPanel.MouseMove += new System.Windows.Forms.MouseEventHandler(this.GridColorFlowPanel_MouseMove);
             this.GridColorFlowPanel.MouseUp += new System.Windows.Forms.MouseEventHandler(this.GridColorFlowPanel_MouseUp);
+            this.GridColorFlowPanel.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.GridColorFlowPanel_MouseWheel);
             // 
             // PanelBottom
             // 
