@@ -183,7 +183,33 @@ namespace GameOfLifeRedo
             return result;
             
         }
-      
+        private void ResetSingleCell(int gnumber)
+        {
+            if(bytegrid[gnumber] != 0)
+            {
+                AliveNeighborsDecBool(gnumber);
+            }
+            while(bytegrid[gnumber] != 0)
+            {
+                NeighborGradientSumDec(gnumber);
+                bytegrid[gnumber]--;
+            }
+            isalive[gnumber] = false;
+            bytegrid_new[gnumber] = 0;
+            bytegrid[gnumber] = 0;
+        }
+
+        private void ResetPartialGrid(int top_left, int bottom_right, int cellcountx)
+        {
+            for(int i = 0; i<bottom_right/cellcountx - top_left / cellcountx +1; i++)
+            {
+                for(int j = 0; j < bottom_right % cellcountx - top_left % cellcountx+1; j++)
+                {
+                    int gnumber = i * cellcountx + j + top_left;
+                    ResetSingleCell(gnumber);
+                }
+            }
+        }
         private void ResetGame()
         {
             PauseGame();
@@ -683,7 +709,20 @@ namespace GameOfLifeRedo
                 {
                     RectClick(mouseDownRectangleNumber);
                 }
-
+                if (copyisinEinfueg)
+                {
+                    //correspondingarraynumbers = FindCorrespondingArrayNumbers(bytegrid, cell_count_x, copiedbytes, mouseDownRectangleNumber);
+                    ResetPartialGrid(correspondingarraynumbers[0, 0], correspondingarraynumbers[correspondingarraynumbers.GetLength(0)-1, correspondingarraynumbers.GetLength(1)-1],cell_count_x);
+                    for(int i = 0; i < copiedbytes.GetLength(0); i++)
+                    {
+                        for(int j = 0; j < copiedbytes.GetLength(1); j++)
+                        {
+                            for(int k = 0; k < copiedbytes[i,j];k++)
+                                RectClick(correspondingarraynumbers[i,j]);
+                        }
+                    }
+                    copyisinEinfueg = false;
+                }
 
 
 
@@ -1004,7 +1043,10 @@ namespace GameOfLifeRedo
         }
         private void ManualTick_Button_Click(object sender, EventArgs e)
         {
-            
+            for(int i = 0; i < cell_count_x * cell_count_y; i++)
+            {
+                bytegrid_new[i] = bytegrid[i];
+            }
             RuleSetModifiedShelter();
         }
 
@@ -1112,7 +1154,7 @@ namespace GameOfLifeRedo
         private void Kopieren_menuItem_Click(object sender, EventArgs e)
         {
             copyisinAuswahl = true;
-            Start_Button.Enabled = false;
+            //Start_Button.Enabled = false;
             Information_groupBox.Show();
             Information_TextBox.Text = "Abbrechen: ESC";
         }
@@ -1198,7 +1240,7 @@ namespace GameOfLifeRedo
 
         private void Einfügen_menuItem_Click(object sender, EventArgs e)
         {
-
+            kopieren_button_Click(null, null);
         }
 
         private void GridColorFlowPanel_MouseUp(object sender, MouseEventArgs e)

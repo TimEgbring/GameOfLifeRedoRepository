@@ -391,12 +391,14 @@
             // Kopieren_menuItem
             // 
             this.Kopieren_menuItem.Index = 0;
+            this.Kopieren_menuItem.Shortcut = System.Windows.Forms.Shortcut.CtrlC;
             this.Kopieren_menuItem.Text = "Kopieren";
             this.Kopieren_menuItem.Click += new System.EventHandler(this.Kopieren_menuItem_Click);
             // 
             // Einfügen_menuItem
             // 
             this.Einfügen_menuItem.Index = 1;
+            this.Einfügen_menuItem.Shortcut = System.Windows.Forms.Shortcut.CtrlV;
             this.Einfügen_menuItem.Text = "Einfügen";
             this.Einfügen_menuItem.Click += new System.EventHandler(this.Einfügen_menuItem_Click);
             // 
