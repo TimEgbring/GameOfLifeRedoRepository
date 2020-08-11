@@ -991,15 +991,15 @@ namespace GameOfLifeRedo
         {
 
             if (gnumber == 0)
-                return new SolidBrush(Color.FromArgb(255,255,255));
+                return dead_white;
             if (gnumber == 1)
-                return new SolidBrush(Color.FromArgb(192, 192, 192));
+                return mygrey1;
             if (gnumber == 2)
-                return new SolidBrush(Color.FromArgb(128, 128, 128));
+                return mygrey2;
             if (gnumber == 3)
-                return new SolidBrush(Color.FromArgb(64, 64, 64));
+                return mygrey3;
             else
-                return new SolidBrush(Color.FromArgb(0, 0, 0));
+                return full_black;
             
         }
         private void ManualTick_Button_Click(object sender, EventArgs e)
@@ -1321,9 +1321,13 @@ namespace GameOfLifeRedo
 
             int relative_x_left_new = top_left_new % cellcountx;
             int relative_x_right_new = bottom_right_new % cellcountx;
+            int relative_y_up_new = top_left_new / cellcountx;
             int relative_y_down_new = bottom_right_new / cellcountx;
             bool borders_south_old = relative_y_up_old > relative_y_down_old;
             bool borders_east_old = relative_x_left_old > relative_x_right_old;
+
+            bool borders_south_new = relative_y_up_new > relative_y_down_new;
+            bool borders_east_new = relative_x_left_new > relative_x_right_new;
 
             for (int i = 0; i<cellcounty; i++)
             {
@@ -1340,10 +1344,14 @@ namespace GameOfLifeRedo
                             {
                                 if(!IsPointWithinRectangle(gnumber, top_left_new, cellcountx*cellcounty-1, cellcountx))
                                     a_w_out_b.Add(gnumber);
+                                else if (borders_east_new != borders_east_old || borders_south_new != borders_south_old)
+                                    a_w_out_b.Add(gnumber);
                             }
                             else if (relative_gnumberx <= relative_x_right_old && relative_gnumbery >= relative_y_up_old)//Bottomleft
                             {
                                 if(!IsPointWithinRectangle(gnumber, top_left_new-top_left_new % cellcountx, cellcountx*cellcounty - cellcountx + bottom_right_new % cellcountx, cellcountx))
+                                    a_w_out_b.Add(gnumber);
+                                else if (borders_east_new != borders_east_old || borders_south_new != borders_south_old)
                                     a_w_out_b.Add(gnumber);
 
                             } 
@@ -1351,12 +1359,16 @@ namespace GameOfLifeRedo
                             {
                                 if(!IsPointWithinRectangle(gnumber, 0, bottom_right_new, cellcountx))
                                     a_w_out_b.Add(gnumber);
+                                else if (borders_east_new != borders_east_old || borders_south_new != borders_south_old)
+                                    a_w_out_b.Add(gnumber);
                             } 
                             else if(relative_gnumberx >= relative_x_left_old && relative_gnumbery <= relative_y_down_old) //Topright 
                             {
                                 if(!IsPointWithinRectangle(gnumber, relative_x_left_new, relative_y_down_new * cellcountx-1, cellcountx))
                                     a_w_out_b.Add(gnumber);
-                                
+                                else if (borders_east_new != borders_east_old || borders_south_new != borders_south_old)
+                                    a_w_out_b.Add(gnumber);
+
                             }
                         }
                         else
@@ -1367,10 +1379,14 @@ namespace GameOfLifeRedo
                                 {
                                     if(!IsPointWithinRectangle(gnumber, top_left_new, relative_y_down_new*cellcountx-1, cellcountx))
                                         a_w_out_b.Add(gnumber);
+                                    else if(borders_east_new != borders_east_old)
+                                        a_w_out_b.Add(gnumber);
                                 }
                                 else if (relative_gnumberx <= relative_x_right_old) //Left
                                 {
                                     if(!IsPointWithinRectangle(gnumber, top_left_new - top_left_new % cellcountx, bottom_right_new, cellcountx))
+                                        a_w_out_b.Add(gnumber);
+                                    else if (borders_east_new != borders_east_old)
                                         a_w_out_b.Add(gnumber);
                                 }
                             }
@@ -1387,10 +1403,14 @@ namespace GameOfLifeRedo
                                 {
                                     if(!IsPointWithinRectangle(gnumber, top_left_new, cellcountx*cellcounty + relative_x_right_new, cellcountx))
                                         a_w_out_b.Add(gnumber);
+                                    else if (borders_south_new != borders_south_old)
+                                        a_w_out_b.Add(gnumber);
                                 }
                                 else if(relative_gnumbery <= relative_y_down_old) //Top
                                 {
                                     if(!IsPointWithinRectangle(gnumber, relative_x_left_new, bottom_right_new, cellcountx))
+                                        a_w_out_b.Add(gnumber);
+                                    else if (borders_south_new != borders_south_old)
                                         a_w_out_b.Add(gnumber);
                                 }
                             }
@@ -1438,18 +1458,26 @@ namespace GameOfLifeRedo
             else
                 return GetFarNeighbor(neighbors[gnumber, direction], direction, offset - 1);
         }
+
+
+        SolidBrush b0 = new SolidBrush(Color.FromArgb(192, 192, 255));
+        SolidBrush b1 = new SolidBrush(Color.FromArgb(144, 144, 255));
+        SolidBrush b2 = new SolidBrush(Color.FromArgb(96, 96, 192));
+        SolidBrush b3 = new SolidBrush(Color.FromArgb(48, 48, 128));
+        SolidBrush b4 = new SolidBrush(Color.FromArgb(0, 0, 64));
+
         private Brush SelectBrushChange(int gnumber)
         {
             if (gnumber == 0)
-                return new SolidBrush(Color.FromArgb(192, 192, 255));
+                return b0;
             if (gnumber == 1)
-                return new SolidBrush(Color.FromArgb(144, 144, 255));
+                return b1;
             if (gnumber == 2)
-                return new SolidBrush(Color.FromArgb(96, 96, 192));
+                return b2;
             if (gnumber == 3)
-                return new SolidBrush(Color.FromArgb(48, 48, 128));
+                return b3;
             else
-                return new SolidBrush(Color.FromArgb(0, 0, 64));
+                return b4;
         }
         private void menuItem6_Click(object sender, EventArgs e)
         {
