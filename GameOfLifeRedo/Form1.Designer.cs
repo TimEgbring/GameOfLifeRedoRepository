@@ -467,6 +467,7 @@
             // 
             // Kopieren_MenuItem
             // 
+            this.Kopieren_MenuItem.Enabled = false;
             this.Kopieren_MenuItem.Index = 1;
             this.Kopieren_MenuItem.Shortcut = System.Windows.Forms.Shortcut.CtrlC;
             this.Kopieren_MenuItem.Text = "Kopieren";

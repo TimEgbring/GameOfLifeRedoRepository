@@ -1175,6 +1175,8 @@ namespace GameOfLifeRedo
             Start_Button.Enabled = false;
             Information_groupBox.Show();
             Information_TextBox.Text = "Abbrechen: ESC";
+            Kopieren_MenuItem.Enabled = true;
+            GridColorFlowPanel.Cursor = Cursors.Cross;
         }
 
         private void Form1_ResizeBegin(object sender, EventArgs e)
@@ -1258,6 +1260,8 @@ namespace GameOfLifeRedo
 
         private void Einfügen_menuItem_Click(object sender, EventArgs e)
         {
+            copyisinEinfueg = true;
+            copyisinAuswahl = false;
             
         }
 
@@ -1568,9 +1572,8 @@ namespace GameOfLifeRedo
                 }
             }
             copiedbytes = CutSectionFromArray(bytegrid, last_selectedbycopy_top_left, last_selectedbycopy_bottom_right, cell_count_x);
-            copyisinEinfueg = true;
-            copyisinAuswahl = false;
-            GridColorFlowPanel.Cursor = Cursors.Cross;
+            
+            GridColorFlowPanel.Cursor = Cursors.Default;
             Einfügen_menuItem.Enabled = true;
         }
 
@@ -1610,6 +1613,7 @@ namespace GameOfLifeRedo
                 }
                 if (isincopy)
                 {
+                    Kopieren_MenuItem.Enabled = false;
                     Einfügen_menuItem.Enabled = false;
                     isincopy = false;
                     Information_groupBox.Hide();
