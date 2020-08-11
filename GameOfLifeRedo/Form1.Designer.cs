@@ -32,7 +32,6 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.GridColorFlowPanel = new System.Windows.Forms.FlowLayoutPanel();
             this.PanelBottom = new System.Windows.Forms.Panel();
-            this.kopieren_button = new System.Windows.Forms.Button();
             this.Information_groupBox = new System.Windows.Forms.GroupBox();
             this.Information_TextBox = new System.Windows.Forms.RichTextBox();
             this.Vorlagenname_label = new System.Windows.Forms.Label();
@@ -60,7 +59,7 @@
             this.AnfangsZustand_MenuItem = new System.Windows.Forms.MenuItem();
             this.Checkpunkt_MenuItem = new System.Windows.Forms.MenuItem();
             this.menuItem2 = new System.Windows.Forms.MenuItem();
-            this.Kopieren_menuItem = new System.Windows.Forms.MenuItem();
+            this.Auswählen_menuItem = new System.Windows.Forms.MenuItem();
             this.Einfügen_menuItem = new System.Windows.Forms.MenuItem();
             this.Vorlagen_menuItem = new System.Windows.Forms.MenuItem();
             this.menuItem5 = new System.Windows.Forms.MenuItem();
@@ -68,6 +67,22 @@
             this.menuItem7 = new System.Windows.Forms.MenuItem();
             this.menuItem8 = new System.Windows.Forms.MenuItem();
             this.Regeln_anpassen_menu_down = new System.Windows.Forms.MenuItem();
+            this.Kopieren_MenuItem = new System.Windows.Forms.MenuItem();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.SizeofcellupDown = new System.Windows.Forms.NumericUpDown();
+            this.label5 = new System.Windows.Forms.Label();
+            this.menuItem3 = new System.Windows.Forms.MenuItem();
+            this.menuItem4 = new System.Windows.Forms.MenuItem();
+            this.menuItem9 = new System.Windows.Forms.MenuItem();
+            this.menuItem10 = new System.Windows.Forms.MenuItem();
+            this.menuItem11 = new System.Windows.Forms.MenuItem();
+            this.menuItem12 = new System.Windows.Forms.MenuItem();
+            this.label6 = new System.Windows.Forms.Label();
+            this.MaxSpeed_numericUpDown = new System.Windows.Forms.NumericUpDown();
+            this.ResetSizeBtn = new System.Windows.Forms.Button();
             this.PanelBottom.SuspendLayout();
             this.Information_groupBox.SuspendLayout();
             this.GroupBoxVersionChange.SuspendLayout();
@@ -75,12 +90,15 @@
             ((System.ComponentModel.ISupportInitialize)(this.DecAbove)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.IncBelow)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.IncAbove)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.SizeofcellupDown)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.MaxSpeed_numericUpDown)).BeginInit();
             this.SuspendLayout();
             // 
             // GridColorFlowPanel
             // 
             this.GridColorFlowPanel.AutoScroll = true;
             this.GridColorFlowPanel.BackColor = System.Drawing.Color.White;
+            this.GridColorFlowPanel.Cursor = System.Windows.Forms.Cursors.Default;
             this.GridColorFlowPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.GridColorFlowPanel.Location = new System.Drawing.Point(0, 0);
             this.GridColorFlowPanel.Name = "GridColorFlowPanel";
@@ -96,7 +114,6 @@
             // PanelBottom
             // 
             this.PanelBottom.BackColor = System.Drawing.SystemColors.ActiveCaption;
-            this.PanelBottom.Controls.Add(this.kopieren_button);
             this.PanelBottom.Controls.Add(this.Information_groupBox);
             this.PanelBottom.Controls.Add(this.Vorlagenname_label);
             this.PanelBottom.Controls.Add(this.ElapsedTime);
@@ -111,34 +128,24 @@
             this.PanelBottom.Controls.Add(this.Start_Button);
             this.PanelBottom.Controls.Add(this.button1);
             this.PanelBottom.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.PanelBottom.Location = new System.Drawing.Point(0, 790);
+            this.PanelBottom.Location = new System.Drawing.Point(0, 837);
             this.PanelBottom.Name = "PanelBottom";
-            this.PanelBottom.Size = new System.Drawing.Size(1904, 190);
+            this.PanelBottom.Size = new System.Drawing.Size(1904, 143);
             this.PanelBottom.TabIndex = 1;
-            // 
-            // kopieren_button
-            // 
-            this.kopieren_button.Location = new System.Drawing.Point(138, 155);
-            this.kopieren_button.Name = "kopieren_button";
-            this.kopieren_button.Size = new System.Drawing.Size(75, 23);
-            this.kopieren_button.TabIndex = 17;
-            this.kopieren_button.Text = "Kopieren";
-            this.kopieren_button.UseVisualStyleBackColor = true;
-            this.kopieren_button.Click += new System.EventHandler(this.kopieren_button_Click);
             // 
             // Information_groupBox
             // 
             this.Information_groupBox.Controls.Add(this.Information_TextBox);
-            this.Information_groupBox.Location = new System.Drawing.Point(0, 123);
+            this.Information_groupBox.Location = new System.Drawing.Point(5, 55);
             this.Information_groupBox.Name = "Information_groupBox";
-            this.Information_groupBox.Size = new System.Drawing.Size(132, 67);
+            this.Information_groupBox.Size = new System.Drawing.Size(124, 67);
             this.Information_groupBox.TabIndex = 16;
             this.Information_groupBox.TabStop = false;
             this.Information_groupBox.Visible = false;
             // 
             // Information_TextBox
             // 
-            this.Information_TextBox.Location = new System.Drawing.Point(0, 9);
+            this.Information_TextBox.Location = new System.Drawing.Point(-2, 9);
             this.Information_TextBox.Name = "Information_TextBox";
             this.Information_TextBox.Size = new System.Drawing.Size(126, 58);
             this.Information_TextBox.TabIndex = 0;
@@ -147,7 +154,7 @@
             // Vorlagenname_label
             // 
             this.Vorlagenname_label.AutoSize = true;
-            this.Vorlagenname_label.Location = new System.Drawing.Point(302, 90);
+            this.Vorlagenname_label.Location = new System.Drawing.Point(252, 66);
             this.Vorlagenname_label.Name = "Vorlagenname_label";
             this.Vorlagenname_label.Size = new System.Drawing.Size(75, 13);
             this.Vorlagenname_label.TabIndex = 15;
@@ -157,7 +164,7 @@
             // ElapsedTime
             // 
             this.ElapsedTime.AutoSize = true;
-            this.ElapsedTime.Location = new System.Drawing.Point(540, 66);
+            this.ElapsedTime.Location = new System.Drawing.Point(573, 51);
             this.ElapsedTime.Name = "ElapsedTime";
             this.ElapsedTime.Size = new System.Drawing.Size(35, 13);
             this.ElapsedTime.TabIndex = 14;
@@ -166,14 +173,23 @@
             // 
             // GroupBoxVersionChange
             // 
+            this.GroupBoxVersionChange.Controls.Add(this.ResetSizeBtn);
+            this.GroupBoxVersionChange.Controls.Add(this.MaxSpeed_numericUpDown);
+            this.GroupBoxVersionChange.Controls.Add(this.label6);
+            this.GroupBoxVersionChange.Controls.Add(this.label5);
+            this.GroupBoxVersionChange.Controls.Add(this.SizeofcellupDown);
+            this.GroupBoxVersionChange.Controls.Add(this.label4);
+            this.GroupBoxVersionChange.Controls.Add(this.label3);
+            this.GroupBoxVersionChange.Controls.Add(this.label2);
+            this.GroupBoxVersionChange.Controls.Add(this.label1);
             this.GroupBoxVersionChange.Controls.Add(this.DecBelow);
             this.GroupBoxVersionChange.Controls.Add(this.DecAbove);
             this.GroupBoxVersionChange.Controls.Add(this.IncBelow);
             this.GroupBoxVersionChange.Controls.Add(this.IncAbove);
             this.GroupBoxVersionChange.Controls.Add(this.button_fertig_regeln_anpassen);
-            this.GroupBoxVersionChange.Location = new System.Drawing.Point(632, 0);
+            this.GroupBoxVersionChange.Location = new System.Drawing.Point(1080, 5);
             this.GroupBoxVersionChange.Name = "GroupBoxVersionChange";
-            this.GroupBoxVersionChange.Size = new System.Drawing.Size(228, 187);
+            this.GroupBoxVersionChange.Size = new System.Drawing.Size(313, 126);
             this.GroupBoxVersionChange.TabIndex = 13;
             this.GroupBoxVersionChange.TabStop = false;
             this.GroupBoxVersionChange.Text = "Regeln anpassen";
@@ -182,7 +198,7 @@
             // DecBelow
             // 
             this.DecBelow.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.25F);
-            this.DecBelow.Location = new System.Drawing.Point(6, 95);
+            this.DecBelow.Location = new System.Drawing.Point(9, 41);
             this.DecBelow.Name = "DecBelow";
             this.DecBelow.Size = new System.Drawing.Size(36, 23);
             this.DecBelow.TabIndex = 17;
@@ -196,7 +212,7 @@
             // DecAbove
             // 
             this.DecAbove.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.25F);
-            this.DecAbove.Location = new System.Drawing.Point(172, 95);
+            this.DecAbove.Location = new System.Drawing.Point(252, 41);
             this.DecAbove.Name = "DecAbove";
             this.DecAbove.Size = new System.Drawing.Size(36, 23);
             this.DecAbove.TabIndex = 16;
@@ -210,7 +226,7 @@
             // IncBelow
             // 
             this.IncBelow.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.25F);
-            this.IncBelow.Location = new System.Drawing.Point(130, 95);
+            this.IncBelow.Location = new System.Drawing.Point(194, 41);
             this.IncBelow.Name = "IncBelow";
             this.IncBelow.Size = new System.Drawing.Size(36, 23);
             this.IncBelow.TabIndex = 15;
@@ -224,7 +240,7 @@
             // IncAbove
             // 
             this.IncAbove.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.25F);
-            this.IncAbove.Location = new System.Drawing.Point(48, 95);
+            this.IncAbove.Location = new System.Drawing.Point(71, 41);
             this.IncAbove.Name = "IncAbove";
             this.IncAbove.Size = new System.Drawing.Size(36, 23);
             this.IncAbove.TabIndex = 14;
@@ -237,7 +253,7 @@
             // 
             // button_fertig_regeln_anpassen
             // 
-            this.button_fertig_regeln_anpassen.Location = new System.Drawing.Point(147, 158);
+            this.button_fertig_regeln_anpassen.Location = new System.Drawing.Point(213, 94);
             this.button_fertig_regeln_anpassen.Name = "button_fertig_regeln_anpassen";
             this.button_fertig_regeln_anpassen.Size = new System.Drawing.Size(75, 23);
             this.button_fertig_regeln_anpassen.TabIndex = 13;
@@ -248,7 +264,7 @@
             // Generation_TextOver_label
             // 
             this.Generation_TextOver_label.AutoSize = true;
-            this.Generation_TextOver_label.Location = new System.Drawing.Point(475, 46);
+            this.Generation_TextOver_label.Location = new System.Drawing.Point(486, 30);
             this.Generation_TextOver_label.Name = "Generation_TextOver_label";
             this.Generation_TextOver_label.Size = new System.Drawing.Size(59, 13);
             this.Generation_TextOver_label.TabIndex = 8;
@@ -257,7 +273,7 @@
             // Generation_Ctr_Label
             // 
             this.Generation_Ctr_Label.AutoSize = true;
-            this.Generation_Ctr_Label.Location = new System.Drawing.Point(494, 66);
+            this.Generation_Ctr_Label.Location = new System.Drawing.Point(505, 50);
             this.Generation_Ctr_Label.Name = "Generation_Ctr_Label";
             this.Generation_Ctr_Label.Size = new System.Drawing.Size(13, 13);
             this.Generation_Ctr_Label.TabIndex = 7;
@@ -265,9 +281,9 @@
             // 
             // Rand_Button
             // 
-            this.Rand_Button.Location = new System.Drawing.Point(912, 68);
+            this.Rand_Button.Location = new System.Drawing.Point(935, 78);
             this.Rand_Button.Name = "Rand_Button";
-            this.Rand_Button.Size = new System.Drawing.Size(75, 23);
+            this.Rand_Button.Size = new System.Drawing.Size(117, 23);
             this.Rand_Button.TabIndex = 6;
             this.Rand_Button.Text = "Random";
             this.Rand_Button.UseVisualStyleBackColor = true;
@@ -275,7 +291,7 @@
             // 
             // Submit_TextBox
             // 
-            this.Submit_TextBox.Location = new System.Drawing.Point(302, 113);
+            this.Submit_TextBox.Location = new System.Drawing.Point(252, 89);
             this.Submit_TextBox.Name = "Submit_TextBox";
             this.Submit_TextBox.Size = new System.Drawing.Size(100, 20);
             this.Submit_TextBox.TabIndex = 5;
@@ -283,7 +299,7 @@
             // 
             // Submit_Template_Button
             // 
-            this.Submit_Template_Button.Location = new System.Drawing.Point(419, 110);
+            this.Submit_Template_Button.Location = new System.Drawing.Point(369, 86);
             this.Submit_Template_Button.Name = "Submit_Template_Button";
             this.Submit_Template_Button.Size = new System.Drawing.Size(106, 23);
             this.Submit_Template_Button.TabIndex = 4;
@@ -294,7 +310,7 @@
             // 
             // ManualTick_Button
             // 
-            this.ManualTick_Button.Location = new System.Drawing.Point(912, 11);
+            this.ManualTick_Button.Location = new System.Drawing.Point(935, 13);
             this.ManualTick_Button.Name = "ManualTick_Button";
             this.ManualTick_Button.Size = new System.Drawing.Size(117, 23);
             this.ManualTick_Button.TabIndex = 3;
@@ -304,7 +320,7 @@
             // 
             // FullSymmetric_Button
             // 
-            this.FullSymmetric_Button.Location = new System.Drawing.Point(912, 41);
+            this.FullSymmetric_Button.Location = new System.Drawing.Point(935, 46);
             this.FullSymmetric_Button.Name = "FullSymmetric_Button";
             this.FullSymmetric_Button.Size = new System.Drawing.Size(117, 23);
             this.FullSymmetric_Button.TabIndex = 2;
@@ -314,17 +330,18 @@
             // 
             // Start_Button
             // 
-            this.Start_Button.Location = new System.Drawing.Point(12, 72);
+            this.Start_Button.BackColor = System.Drawing.Color.Silver;
+            this.Start_Button.Location = new System.Drawing.Point(5, 3);
             this.Start_Button.Name = "Start_Button";
-            this.Start_Button.Size = new System.Drawing.Size(124, 32);
+            this.Start_Button.Size = new System.Drawing.Size(124, 46);
             this.Start_Button.TabIndex = 1;
             this.Start_Button.Text = "Start";
-            this.Start_Button.UseVisualStyleBackColor = true;
+            this.Start_Button.UseVisualStyleBackColor = false;
             this.Start_Button.Click += new System.EventHandler(this.Start_Button_Click);
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(268, 12);
+            this.button1.Location = new System.Drawing.Point(255, 12);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 23);
             this.button1.TabIndex = 0;
@@ -334,7 +351,7 @@
             // 
             // GenerationTimer
             // 
-            this.GenerationTimer.Interval = 10;
+            this.GenerationTimer.Interval = 50;
             this.GenerationTimer.Tick += new System.EventHandler(this.GenerationTimer_Tick);
             // 
             // mainMenu1
@@ -384,20 +401,22 @@
             // 
             this.menuItem2.Index = 1;
             this.menuItem2.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
-            this.Kopieren_menuItem,
+            this.Auswählen_menuItem,
+            this.Kopieren_MenuItem,
             this.Einfügen_menuItem});
             this.menuItem2.Text = "Bearbeiten";
             // 
-            // Kopieren_menuItem
+            // Auswählen_menuItem
             // 
-            this.Kopieren_menuItem.Index = 0;
-            this.Kopieren_menuItem.Shortcut = System.Windows.Forms.Shortcut.CtrlC;
-            this.Kopieren_menuItem.Text = "Kopieren";
-            this.Kopieren_menuItem.Click += new System.EventHandler(this.Kopieren_menuItem_Click);
+            this.Auswählen_menuItem.Index = 0;
+            this.Auswählen_menuItem.Shortcut = System.Windows.Forms.Shortcut.CtrlA;
+            this.Auswählen_menuItem.Text = "Auswählen";
+            this.Auswählen_menuItem.Click += new System.EventHandler(this.Kopieren_menuItem_Click);
             // 
             // Einfügen_menuItem
             // 
-            this.Einfügen_menuItem.Index = 1;
+            this.Einfügen_menuItem.Enabled = false;
+            this.Einfügen_menuItem.Index = 2;
             this.Einfügen_menuItem.Shortcut = System.Windows.Forms.Shortcut.CtrlV;
             this.Einfügen_menuItem.Text = "Einfügen";
             this.Einfügen_menuItem.Click += new System.EventHandler(this.Einfügen_menuItem_Click);
@@ -412,7 +431,13 @@
             this.menuItem5.Index = 3;
             this.menuItem5.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
             this.menuItem6,
-            this.menuItem7});
+            this.menuItem7,
+            this.menuItem9,
+            this.menuItem3,
+            this.menuItem4,
+            this.menuItem10,
+            this.menuItem11,
+            this.menuItem12});
             this.menuItem5.Text = "Hilfe";
             // 
             // menuItem6
@@ -440,6 +465,148 @@
             this.Regeln_anpassen_menu_down.Text = "Regeln anpassen";
             this.Regeln_anpassen_menu_down.Click += new System.EventHandler(this.RegelnAnpassenMenu_Click);
             // 
+            // Kopieren_MenuItem
+            // 
+            this.Kopieren_MenuItem.Index = 1;
+            this.Kopieren_MenuItem.Shortcut = System.Windows.Forms.Shortcut.CtrlC;
+            this.Kopieren_MenuItem.Text = "Kopieren";
+            this.Kopieren_MenuItem.Click += new System.EventHandler(this.Kopieren_MenuItem_Click_1);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(6, 25);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(56, 13);
+            this.label1.TabIndex = 18;
+            this.label1.Text = "DecBelow";
+            this.label1.Visible = false;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(191, 25);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(51, 13);
+            this.label2.TabIndex = 19;
+            this.label2.Text = "IncBelow";
+            this.label2.Visible = false;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(252, 25);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(58, 13);
+            this.label3.TabIndex = 20;
+            this.label3.Text = "DecAbove";
+            this.label3.Visible = false;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(68, 25);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(53, 13);
+            this.label4.TabIndex = 21;
+            this.label4.Text = "IncAbove";
+            this.label4.Visible = false;
+            // 
+            // SizeofcellupDown
+            // 
+            this.SizeofcellupDown.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.25F);
+            this.SizeofcellupDown.Location = new System.Drawing.Point(9, 94);
+            this.SizeofcellupDown.Name = "SizeofcellupDown";
+            this.SizeofcellupDown.Size = new System.Drawing.Size(36, 23);
+            this.SizeofcellupDown.TabIndex = 22;
+            this.SizeofcellupDown.Value = new decimal(new int[] {
+            5,
+            0,
+            0,
+            0});
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(9, 78);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(61, 13);
+            this.label5.TabIndex = 23;
+            this.label5.Text = "Size Of Cell";
+            // 
+            // menuItem3
+            // 
+            this.menuItem3.Index = 3;
+            this.menuItem3.Text = "Wie manipuliere ich die Zellen?";
+            // 
+            // menuItem4
+            // 
+            this.menuItem4.Index = 4;
+            this.menuItem4.Text = "Zustand zurücksetzen";
+            // 
+            // menuItem9
+            // 
+            this.menuItem9.Index = 2;
+            this.menuItem9.Text = "Eigene Vorlagen speichern";
+            // 
+            // menuItem10
+            // 
+            this.menuItem10.Index = 5;
+            this.menuItem10.Text = "Den Programmablauf schneller machen";
+            // 
+            // menuItem11
+            // 
+            this.menuItem11.Index = 6;
+            this.menuItem11.Text = "Über das Manipulieren von Regeln";
+            // 
+            // menuItem12
+            // 
+            this.menuItem12.Index = 7;
+            this.menuItem12.Text = "Kopieren und Einfügen";
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(122, 78);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(108, 13);
+            this.label6.TabIndex = 24;
+            this.label6.Text = "Max Speed (ms/Gen)";
+            // 
+            // MaxSpeed_numericUpDown
+            // 
+            this.MaxSpeed_numericUpDown.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.25F);
+            this.MaxSpeed_numericUpDown.Location = new System.Drawing.Point(146, 94);
+            this.MaxSpeed_numericUpDown.Maximum = new decimal(new int[] {
+            2000,
+            0,
+            0,
+            0});
+            this.MaxSpeed_numericUpDown.Minimum = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this.MaxSpeed_numericUpDown.Name = "MaxSpeed_numericUpDown";
+            this.MaxSpeed_numericUpDown.Size = new System.Drawing.Size(36, 23);
+            this.MaxSpeed_numericUpDown.TabIndex = 25;
+            this.MaxSpeed_numericUpDown.Value = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this.MaxSpeed_numericUpDown.ValueChanged += new System.EventHandler(this.MaxSpeed_numericUpDown_ValueChanged);
+            // 
+            // ResetSizeBtn
+            // 
+            this.ResetSizeBtn.Location = new System.Drawing.Point(51, 94);
+            this.ResetSizeBtn.Name = "ResetSizeBtn";
+            this.ResetSizeBtn.Size = new System.Drawing.Size(55, 23);
+            this.ResetSizeBtn.TabIndex = 26;
+            this.ResetSizeBtn.Text = "Reset";
+            this.ResetSizeBtn.UseVisualStyleBackColor = true;
+            this.ResetSizeBtn.Click += new System.EventHandler(this.ResetSizeBtn_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -449,20 +616,25 @@
             this.Controls.Add(this.GridColorFlowPanel);
             this.DoubleBuffered = true;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.KeyPreview = true;
             this.Menu = this.mainMenu1;
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "Game of Life by Tim E";
             this.ResizeBegin += new System.EventHandler(this.Form1_ResizeBegin);
             this.ResizeEnd += new System.EventHandler(this.Form1_ResizeEnd);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             this.PanelBottom.ResumeLayout(false);
             this.PanelBottom.PerformLayout();
             this.Information_groupBox.ResumeLayout(false);
             this.GroupBoxVersionChange.ResumeLayout(false);
+            this.GroupBoxVersionChange.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.DecBelow)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.DecAbove)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.IncBelow)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.IncAbove)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.SizeofcellupDown)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.MaxSpeed_numericUpDown)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -502,11 +674,26 @@
         private System.Windows.Forms.MenuItem Checkpunkt_MenuItem;
         private System.Windows.Forms.MenuItem AnfangsZustand_MenuItem;
         private System.Windows.Forms.MenuItem menuItem2;
-        private System.Windows.Forms.MenuItem Kopieren_menuItem;
+        private System.Windows.Forms.MenuItem Auswählen_menuItem;
         private System.Windows.Forms.MenuItem Einfügen_menuItem;
         private System.Windows.Forms.GroupBox Information_groupBox;
         private System.Windows.Forms.RichTextBox Information_TextBox;
-        private System.Windows.Forms.Button kopieren_button;
+        private System.Windows.Forms.MenuItem Kopieren_MenuItem;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.NumericUpDown SizeofcellupDown;
+        private System.Windows.Forms.MenuItem menuItem9;
+        private System.Windows.Forms.MenuItem menuItem3;
+        private System.Windows.Forms.MenuItem menuItem4;
+        private System.Windows.Forms.MenuItem menuItem10;
+        private System.Windows.Forms.MenuItem menuItem11;
+        private System.Windows.Forms.MenuItem menuItem12;
+        private System.Windows.Forms.NumericUpDown MaxSpeed_numericUpDown;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Button ResetSizeBtn;
     }
 }
 

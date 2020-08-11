@@ -25,6 +25,7 @@ namespace GameOfLifeRedo
         const int placeforinformation = 10;
         bool copyisinAuswahl = false;
         bool copyisinEinfueg = false;
+        bool isincopy = false;
         byte[,] copiedbytes = null;
         bool mouseDown;
         Point mouseDownPoint;
@@ -62,7 +63,7 @@ namespace GameOfLifeRedo
         
 
         static int cell_count_x, cell_count_y;
-        public int sizeofcell = 7;
+        public int sizeofcell = 2;
         public struct GameState
         {
             public int generationcounter;
@@ -92,7 +93,8 @@ namespace GameOfLifeRedo
             int szh = Screen.PrimaryScreen.WorkingArea.Size.Height;
             
             this.Size = new Size(sz, szh);
-            
+            sizeofcell = (int)this.SizeofcellupDown.Value;
+            this.GenerationTimer.Interval = (int)MaxSpeed_numericUpDown.Value;
             this.SetStyle(ControlStyles.OptimizedDoubleBuffer| ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.SupportsTransparentBackColor, true);
             InitVariables();
             InitNeighbors();
@@ -229,6 +231,7 @@ namespace GameOfLifeRedo
         }
         private void InitVariables()
         {
+            
             top_left_x = GridColorFlowPanel.Location.X;
             top_left_y = GridColorFlowPanel.Location.Y;
             int tmp_bottom_right_x = top_left_x + GridColorFlowPanel.Width;
@@ -307,8 +310,8 @@ namespace GameOfLifeRedo
         }
         private void GenerationTimer_Tick(object sender, EventArgs e)
         {
-            if (generationcounter == 500)
-                Start_Button_Click(null, null);
+            //if (generationcounter == 500)
+            //    Start_Button_Click(null, null);
             RuleSetModifiedShelter();
             Generation_Ctr_Label.Text = (++generationcounter).ToString();
         }
@@ -338,12 +341,13 @@ namespace GameOfLifeRedo
         {
             Start_Button.Text = "Pause";
             isrunning = true;
-            
+            Start_Button.BackColor = Color.SlateGray;
             time_start = DateTime.Now;
             GenerationTimer.Start();
         }
         private void PauseGame()
         {
+            Start_Button.BackColor = Color.Silver;
             Start_Button.Text = "Start";
             isrunning = false;
             GenerationTimer.Stop();
@@ -722,6 +726,7 @@ namespace GameOfLifeRedo
                         }
                     }
                     copyisinEinfueg = false;
+                    GridColorFlowPanel.Cursor = Cursors.Default;
                 }
 
 
@@ -729,6 +734,17 @@ namespace GameOfLifeRedo
 
 
 
+            }
+        }
+
+        private void UpdatePartialGrid(int topleft, int bottomright, int cellcountx)
+        {
+            for (int i = 0; i < bottomright/cellcountx - topleft/cellcountx; i++)
+            {
+                for (int j = 0; j < bottomright%cellcountx-topleft%cellcountx; j++)
+                {
+                    g.FillRectangle(ByteToBrush(bytegrid[i * cellcountx + j + topleft]), rect_grid[i*cellcountx+j+topleft]);
+                }
             }
         }
 
@@ -1153,8 +1169,10 @@ namespace GameOfLifeRedo
 
         private void Kopieren_menuItem_Click(object sender, EventArgs e)
         {
+            PauseGame();
             copyisinAuswahl = true;
-            //Start_Button.Enabled = false;
+            isincopy = true;
+            Start_Button.Enabled = false;
             Information_groupBox.Show();
             Information_TextBox.Text = "Abbrechen: ESC";
         }
@@ -1240,7 +1258,7 @@ namespace GameOfLifeRedo
 
         private void Einfügen_menuItem_Click(object sender, EventArgs e)
         {
-            kopieren_button_Click(null, null);
+            
         }
 
         private void GridColorFlowPanel_MouseUp(object sender, MouseEventArgs e)
@@ -1538,6 +1556,73 @@ namespace GameOfLifeRedo
                 copiedbytes = RotateMatrix(copiedbytes, 1);
                 GridColorFlowPanel_MouseMove(this, e);
             }
+        }
+
+        private void Kopieren_MenuItem_Click_1(object sender, EventArgs e)
+        {
+            for (int i = last_selectedbycopy_top_left; i <= last_selectedbycopy_bottom_right; i++)
+            {
+                if (isselectedbycopy[i])
+                {
+                    g.FillRectangle(ByteToBrush(bytegrid[i]), rect_grid[i]);
+                }
+            }
+            copiedbytes = CutSectionFromArray(bytegrid, last_selectedbycopy_top_left, last_selectedbycopy_bottom_right, cell_count_x);
+            copyisinEinfueg = true;
+            copyisinAuswahl = false;
+            GridColorFlowPanel.Cursor = Cursors.Cross;
+            Einfügen_menuItem.Enabled = true;
+        }
+
+        private void MaxSpeed_numericUpDown_ValueChanged(object sender, EventArgs e)
+        {
+            this.GenerationTimer.Interval = (int)((NumericUpDown) sender).Value;
+        }
+
+        private void Form1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Escape)
+            {
+
+                if (copyisinAuswahl)
+                {
+                    for (int i = 0; i < cell_count_x * cell_count_y; i++)
+                    {
+                        if (isselectedbycopy[i])
+                            g.FillRectangle(ByteToBrush(bytegrid[i]), rect_grid[i]);
+                    }
+                    copyisinAuswahl = false;
+                    GridColorFlowPanel.Cursor = Cursors.Default;
+                    Information_groupBox.Hide();
+                    Start_Button.Enabled = true;
+                    
+                }
+                if (copyisinEinfueg)
+                {
+                    foreach(int i in correspondingarraynumbers) { 
+                            g.FillRectangle(ByteToBrush(bytegrid[i]), rect_grid[i]);
+                    }
+                    
+                    copyisinEinfueg = false;
+                    GridColorFlowPanel.Cursor = Cursors.Default;
+                    Information_groupBox.Hide();
+                    Start_Button.Enabled = true;
+                }
+                if (isincopy)
+                {
+                    Einfügen_menuItem.Enabled = false;
+                    isincopy = false;
+                    Information_groupBox.Hide();
+                    Start_Button.Enabled = true;
+                }
+                
+            }
+        }
+
+        private void ResetSizeBtn_Click(object sender, EventArgs e)
+        {
+            sizeofcell = (int) this.SizeofcellupDown.Value;
+            ResetToNewSize();
         }
 
         private void BytegridChangeAction()
