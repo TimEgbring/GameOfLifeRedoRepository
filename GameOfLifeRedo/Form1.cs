@@ -16,7 +16,6 @@ namespace GameOfLifeRedo
     public partial class Form1 : Form
     {
         
-        
         readonly Brush dead_white = new SolidBrush(Color.FromArgb(255,255,255));
         readonly Brush mygrey1 = new SolidBrush(Color.FromArgb(192, 192, 192));
         readonly Brush mygrey2 = new SolidBrush(Color.FromArgb(128, 128, 128));
@@ -42,7 +41,6 @@ namespace GameOfLifeRedo
 
         Graphics g = null;
         
-        
         bool isrunning = false;
         bool gamehasstarted = false;
         bool[] isalive;
@@ -60,7 +58,6 @@ namespace GameOfLifeRedo
 
         static int top_left_x, top_left_y;
         static int bottom_right_x, bottom_right_y;
-        
 
         static int cell_count_x, cell_count_y;
         int rangeofsymm;
@@ -92,7 +89,6 @@ namespace GameOfLifeRedo
             InitVorlagenToolstrip();
             int sz = Screen.PrimaryScreen.WorkingArea.Size.Width;
             int szh = Screen.PrimaryScreen.WorkingArea.Size.Height;
-            
             this.Size = new Size(sz, szh);
             rangeofsymm = (int) this.SizeofSymmUpDown.Value;
             sizeofcell = (int)this.SizeofcellupDown.Value;
@@ -100,17 +96,12 @@ namespace GameOfLifeRedo
             this.SetStyle(ControlStyles.OptimizedDoubleBuffer| ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.SupportsTransparentBackColor, true);
             InitVariables();
             InitNeighbors();
-            
-
-
             AdjustWinFrame();
-            
             g = GridColorFlowPanel.CreateGraphics();
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.None;
             g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.Low;
             g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighSpeed;
             //ControlPaint.DrawFocusRectangle(g, new Rectangle(50, 50, 100, 100),Color.Green,Color.Black);
-
         }
 
         private GameState GetCurrentGameState()
@@ -122,15 +113,11 @@ namespace GameOfLifeRedo
                 cell_count_y = cell_count_y,
                 isrunning = isrunning,
                 sizeofcell = sizeofcell,
-
                 time_start = time_start,
-
-
                 top_left_x = top_left_x,
                 top_left_y = top_left_y,
                 bottom_right_x = bottom_right_x,
                 bottom_right_y = bottom_right_y,
-
                 rect_grid = DeepCopy(rect_grid),
                 bytegrid = DeepCopy(bytegrid),
                 bytegrid_new = DeepCopy(bytegrid_new),
@@ -140,9 +127,7 @@ namespace GameOfLifeRedo
                 neighbors_gradient_sum = DeepCopy(neighbors_gradient_sum),
                 isalive = DeepCopy(isalive),
             };
-
             return gstate;
-
         }
         public void SetCurrentGameState(GameState gstate)
         {
@@ -1654,7 +1639,7 @@ namespace GameOfLifeRedo
 
         private void menuItem13_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Anmerkung: Die Regeln in der Menüleiste anpassbar.\nEine Zelle wird schwächer, wenn die Summe der Gradienten seiner Nachbarn weniger als x beträgt. Eine Zelle wird stärker, wenn die Gradientensumme seiner Nachbarn größer als x und kleiner als x ist.\n Eine Zelle wird schwächer wenn die Gradientensumme seiner Nachbarn größer als x ist.\nAus diesen Regeln folgt implizit, dass der Zustand bei Summe = 8 und Summe = 12 unverändert bleibt.\n Bei Summe = 16, Summe = 20 bleibt der Zustand unverändert, ungeachtet aller anderen Regeln.");
+            MessageBox.Show("Anmerkung: Die Regeln in der Menüleiste anpassbar.\nIn dieser Version hat jede Zelle 5 Zustände, bzw 4 verschiedene Lebende.\nSie sind mit den Zahlen 0,1,2,3 und 4 gleichzusetzen, wobei 0 bedeutet, dass die Zelle tot ist und 4, dass sie komplett aufgefüllt ist. \nEine Zelle wird (um eins) schwächer, wenn die Summe der Gradienten seiner Nachbarn weniger als x beträgt. Eine Zelle wird stärker, wenn die Gradientensumme seiner Nachbarn größer als x und kleiner als x ist.\n Eine Zelle wird schwächer wenn die Gradientensumme seiner Nachbarn größer als x ist.\nAus diesen Regeln folgt implizit, dass der Zustand bei Summe = 8 und Summe = 12 unverändert bleibt.\n Bei Summe = 16, Summe = 20 bleibt der Zustand unverändert, ungeachtet aller anderen Regeln.");
         }
 
         private void menuItem9_Click(object sender, EventArgs e)
@@ -1680,6 +1665,11 @@ namespace GameOfLifeRedo
         private void menuItem12_Click(object sender, EventArgs e)
         {
             MessageBox.Show("Um das Erstellen von komplexeren Formen zu erleichtern, wurde eine Kopierfunktion implementiert.\nSie können Teile Kopieren und dann sooft Sie wollen einfügen, sowie während des Einfügens mit dem Mausrad rotieren.\nDiese Funktionen finden Sie unter dem Menüreiter \"Bearbeiten\".\nWählen Sie zuerst durch Drag&Drop ihr gewünschtes Feld aus, welches Sie kopieren möchten. \nTipp: Nutzen Sie hierfür die Tastenkürzel Strg + A, Strg + C, Strg + V. Nachdem Sie auf Kopieren gedrückt haben, können Sie mit dem Mauszeiger über das Raster wandern und das Feld an gewünschter Stelle mit einem Mausklick einfügen, oder vorher mithilfe des Mausrades rotieren. Sobald Sie fertig sind, drücken Sie auf \"Esc\" - Escape.");
+        }
+
+        private void menuItem3_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Klicke auf die Zellen um den Zustand um Eins zu erhöhen, bzw. um es auf tot zurückzusetzen.");
         }
 
         private void BytegridChangeAction()
@@ -1845,22 +1835,22 @@ namespace GameOfLifeRedo
                                 bytegrid[n1] = 2;
                                 AliveNeighborsIncBool(n1);
                                 isalive[n1] = true;
-                                    NeighborGradientSumInc(n1, 2);
+                                NeighborGradientSumInc(n1, 2);
                                 g.FillRectangle(mygrey2, rect_grid[n2]);
                                 bytegrid[n2] = 2;
                                 AliveNeighborsIncBool(n2);
                                 isalive[n2] = true;
-                                    NeighborGradientSumInc(n2,2);
+                                NeighborGradientSumInc(n2,2);
                                 g.FillRectangle(mygrey2, rect_grid[n3]);
                                 bytegrid[n3] = 2;
                                 AliveNeighborsIncBool(n3);
                                 isalive[n3] = true;
-                                    NeighborGradientSumInc(n3,2);
+                                NeighborGradientSumInc(n3,2);
                                 g.FillRectangle(mygrey2, rect_grid[n4]);
                                 bytegrid[n4] = 2;
                                 AliveNeighborsIncBool(n4);
                                 isalive[n4] = true;
-                                    NeighborGradientSumInc(n4,2);
+                                NeighborGradientSumInc(n4,2);
                                 if (n1 != n12)
                                 {
                                     g.FillRectangle(mygrey2, rect_grid[n12]);
@@ -1883,7 +1873,7 @@ namespace GameOfLifeRedo
                                     AliveNeighborsIncBool(n42);
                                     isalive[n42] = true;
                                     
-                                        NeighborGradientSumInc(n42, 2);
+                                      NeighborGradientSumInc(n42, 2);
                                     
                                 }
                                 break;
@@ -1894,7 +1884,7 @@ namespace GameOfLifeRedo
                                 isalive[n1] = true;
 
                                 
-                                    NeighborGradientSumInc(n1, 3);
+                                NeighborGradientSumInc(n1, 3);
                                 
 
                                 g.FillRectangle(mygrey3, rect_grid[n2]);
@@ -1903,7 +1893,7 @@ namespace GameOfLifeRedo
                                 isalive[n2] = true;
 
                                 
-                                    NeighborGradientSumInc(n2, 3);
+                                NeighborGradientSumInc(n2, 3);
                                 
 
                                 g.FillRectangle(mygrey3, rect_grid[n3]);
@@ -1912,7 +1902,7 @@ namespace GameOfLifeRedo
                                 isalive[n3] = true;
 
                                 
-                                    NeighborGradientSumInc(n3, 3);
+                                NeighborGradientSumInc(n3, 3);
                                 
 
                                 g.FillRectangle(mygrey3, rect_grid[n4]);
@@ -1921,7 +1911,7 @@ namespace GameOfLifeRedo
                                 isalive[n4] = true;
 
                                 
-                                    NeighborGradientSumInc(n4, 3);
+                                NeighborGradientSumInc(n4, 3);
                                 
                                 if (n1 != n12)
                                 {
@@ -1931,7 +1921,7 @@ namespace GameOfLifeRedo
                                     isalive[n12] = true;
 
                                     
-                                        NeighborGradientSumInc(n12, 3);
+                                    NeighborGradientSumInc(n12, 3);
                                     
 
                                     g.FillRectangle(mygrey3, rect_grid[n22]);
@@ -1940,7 +1930,7 @@ namespace GameOfLifeRedo
                                     isalive[n22] = true;
 
                                     
-                                        NeighborGradientSumInc(n22, 3);
+                                    NeighborGradientSumInc(n22, 3);
                                     
 
                                     g.FillRectangle(mygrey3, rect_grid[n32]);
@@ -1949,7 +1939,7 @@ namespace GameOfLifeRedo
                                     isalive[n32] = true;
 
                                     
-                                        NeighborGradientSumInc(n32, 3);
+                                     NeighborGradientSumInc(n32, 3);
                                     
 
                                     g.FillRectangle(mygrey3, rect_grid[n42]);
@@ -1957,7 +1947,7 @@ namespace GameOfLifeRedo
                                     AliveNeighborsIncBool(n42);
                                     isalive[n42] = true;
                                     
-                                        NeighborGradientSumInc(n42, 3);
+                                    NeighborGradientSumInc(n42, 3);
                                     
                                 }
                                 break;
@@ -1968,7 +1958,7 @@ namespace GameOfLifeRedo
                                 AliveNeighborsIncBool(n1);
                                 isalive[n1] = true;
                                 
-                                    NeighborGradientSumInc(n1, 4);
+                                NeighborGradientSumInc(n1, 4);
                                 
 
                                 g.FillRectangle(full_black, rect_grid[n2]);
@@ -1977,7 +1967,7 @@ namespace GameOfLifeRedo
                                 AliveNeighborsIncBool(n2);
                                 isalive[n2] = true;
                                 
-                                    NeighborGradientSumInc(n2, 4);
+                                NeighborGradientSumInc(n2, 4);
                                 
 
                                 g.FillRectangle(full_black, rect_grid[n3]);
@@ -1986,7 +1976,7 @@ namespace GameOfLifeRedo
                                 AliveNeighborsIncBool(n3);
                                 isalive[n3] = true;
                                 
-                                    NeighborGradientSumInc(n3, 4);
+                                NeighborGradientSumInc(n3, 4);
                                 
 
                                 g.FillRectangle(full_black, rect_grid[n4]);
@@ -1995,7 +1985,7 @@ namespace GameOfLifeRedo
                                 AliveNeighborsIncBool(n4);
                                 isalive[n4] = true;
                                 
-                                    NeighborGradientSumInc(n4, 4);
+                                NeighborGradientSumInc(n4, 4);
 
                                 if (n1 != n12)
                                 {
@@ -2006,7 +1996,6 @@ namespace GameOfLifeRedo
                                     isalive[n12] = true;
 
                                     NeighborGradientSumInc(n12, 4);
-
 
                                     g.FillRectangle(full_black, rect_grid[n22]);
                                     bytegrid[n22] = 4;
@@ -2029,14 +2018,10 @@ namespace GameOfLifeRedo
                                     NeighborGradientSumInc(n42, 4);
                                 }
                                 break;
-
                             default:
                                 break;
                         }
-
-                    
                 }
-
             }
             for(int i = 0; i < cell_count_x * cell_count_y; i++)
             {
@@ -2045,9 +2030,7 @@ namespace GameOfLifeRedo
         }
         private void Randomize()
         {
-
             Random rnd = new Random();
-
                 for (int i = 0; i < cell_count_x*cell_count_y; i++)
                 {
                     switch (rnd.Next(0, 5))
@@ -2056,14 +2039,11 @@ namespace GameOfLifeRedo
                             g.FillRectangle(dead_white, rect_grid[i]);
                             bytegrid[i] = 0;
                             isalive[i] = false;
-
                             break;
                         case 1:
                             g.FillRectangle(mygrey1, rect_grid[i]);
                             bytegrid[i] = 1;
                             ModifiedButtonIncGeneralized(i);
-
-
                         break;
                         case 2:
                             g.FillRectangle(mygrey2, rect_grid[i]);
@@ -2080,11 +2060,9 @@ namespace GameOfLifeRedo
                             bytegrid[i] = 4;
                         ModifiedButtonIncGeneralized(i, 4);
                         break;
-
                         default:
                             break;
                     }
-
                 }
             for (int i = 0; i < cell_count_x * cell_count_y; i++)
             {

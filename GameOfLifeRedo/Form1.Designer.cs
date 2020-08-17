@@ -601,7 +601,6 @@
             // menuItem6
             // 
             this.menuItem6.Index = 0;
-            this.menuItem6.Shortcut = System.Windows.Forms.Shortcut.F5;
             this.menuItem6.Text = "Was ist Game of Life?";
             this.menuItem6.Click += new System.EventHandler(this.menuItem6_Click);
             // 
@@ -621,6 +620,7 @@
             // 
             this.menuItem3.Index = 4;
             this.menuItem3.Text = "Wie manipuliere ich die Zellen?";
+            this.menuItem3.Click += new System.EventHandler(this.menuItem3_Click);
             // 
             // menuItem4
             // 
