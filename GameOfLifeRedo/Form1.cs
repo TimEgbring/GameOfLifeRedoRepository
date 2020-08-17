@@ -334,6 +334,7 @@ namespace GameOfLifeRedo
             else
             {
                 ElapsedTime.Show();
+                label8.Show();
                 ElapsedTime.Text = (DateTime.Now - time_start).ToString();
                 PauseGame();
             }
@@ -1065,6 +1066,7 @@ namespace GameOfLifeRedo
             {
                 bytegrid_new[i] = bytegrid[i];
             }
+
             RuleSetModifiedShelter();
         }
 
@@ -1117,7 +1119,7 @@ namespace GameOfLifeRedo
         {
             if (IncBelow.Value > DecAbove.Value)
             {
-                DecAbove.Value = IncBelow.Value + 1;
+                DecAbove.Value = IncBelow.Value - 1;
             }
         }
 
@@ -1125,7 +1127,7 @@ namespace GameOfLifeRedo
         {
             if (DecAbove.Value < IncBelow.Value)
             {
-                IncBelow.Value = DecAbove.Value - 1;
+                IncBelow.Value = DecAbove.Value + 1;
             }
         }
 
@@ -1549,7 +1551,7 @@ namespace GameOfLifeRedo
         }
         private void menuItem6_Click(object sender, EventArgs e)
         {
-            
+            MessageBox.Show("Das „Game of Life“ wurde 1970 von John Conway geschaffen.  Es ist besteht aus einem 2D-Raster, in welchem sich \"lebende\" und \"tote\" Zellen befinden. Zu Beginn befindet sich in diesem Raster ein Anfangsmuster bzw. Anfangszustand. Dieses Zellmuster entwickelt sich von Generation zu Generation anhand von wenigen, einfachen Regeln weiter.");
         }
 
         private void GridColorFlowPanel_MouseWheel(object sender, System.Windows.Forms.MouseEventArgs e)
@@ -1643,6 +1645,41 @@ namespace GameOfLifeRedo
         private void SizeofcellupDown_ValueChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void menuItem7_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("-Eine tote Zelle mit genau drei lebenden Nachbarn wird in der Folgegeneration neu geboren.\n-Lebende Zellen mit weniger als zwei lebenden Nachbarn sterben in der Folgegeneration an Einsamkeit.\n-Eine lebende Zelle mit zwei oder drei lebenden Nachbarn bleibt in der Folgegeneration am Leben.\n-Lebende Zellen mit mehr als drei lebenden Nachbarn sterben in der Folgegeneration an Überbevölkerung.\n");
+        }
+
+        private void menuItem13_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Anmerkung: Die Regeln in der Menüleiste anpassbar.\nEine Zelle wird schwächer, wenn die Summe der Gradienten seiner Nachbarn weniger als x beträgt. Eine Zelle wird stärker, wenn die Gradientensumme seiner Nachbarn größer als x und kleiner als x ist.\n Eine Zelle wird schwächer wenn die Gradientensumme seiner Nachbarn größer als x ist.\nAus diesen Regeln folgt implizit, dass der Zustand bei Summe = 8 und Summe = 12 unverändert bleibt.\n Bei Summe = 16, Summe = 20 bleibt der Zustand unverändert, ungeachtet aller anderen Regeln.");
+        }
+
+        private void menuItem9_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Drücken Sie in der Menüleiste auf Vorlage speichern, um den derzeitig angezeigten Zustand als zukünftig gespeicherte Vorlage wiederherstellen zu können.\nDanach geben Sie unten Links dem Namen ein, den die Vorlage haben soll.\nDanach drücken Sie auf \"Submit\". Die Vorlage sollte nun gespeichert sein.\n\nHinweis: Sollten Sie das Spiel bereits gestartet haben, können Sie den Anfangszustand wiederherstellen und ihn dann als Vorlage speichern.\n\nEine gespeicherte Vorlage lässt sich in der Menüleiste Laden.");
+        }
+
+        private void menuItem4_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Sobald Sie mit einem Anfangszustand das Spiel geladen haben, ist dieser Zustand gespeichert, so dass man ihn bei interessanten Interaktionen der Zellen wiederherstellen kann, um ihn genauer zu betrachten, oder ihn speichern zu können. Klicken Sie hierfür unter \"Datei\" auf \"Zustand wiederherstellen\" und starten Sie das Spiel nach belieben erneut.\n\n Sie können auch einen späteren Zustand manuell speichern und somit den Anfangszustand überschreiben, um beispielsweise Veränderungen zu übernehmen.");
+        }
+
+        private void menuItem10_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Ist Ihnen der Generationswechsel zu schnell, können Sie unter \"Version\" und dann \"Regeln anpassen\" die Geschwindigkeit beliebig anpassen.");
+        }
+
+        private void menuItem11_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Sie können unter \"Version\" und dann \"Regeln anpassen\" die Regeln des Game of Life anpassen.\nDies ist zum rumspielen auch möglich, während das Spiel am laufen ist.\n Zudem finden Sie dort die Möglichkeit, die Größe der Zellen anzupassen (Nach dem Ändern muss der Reset-Knopf gedrückt werden), sowie das Erstellen eines zufälligen, symmetrischen Anfangszustandes mit größerem/kleinerem Feld.");
+        }
+
+        private void menuItem12_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Um das Erstellen von komplexeren Formen zu erleichtern, wurde eine Kopierfunktion implementiert.\nSie können Teile Kopieren und dann sooft Sie wollen einfügen, sowie während des Einfügens mit dem Mausrad rotieren.\nDiese Funktionen finden Sie unter dem Menüreiter \"Bearbeiten\".\nWählen Sie zuerst durch Drag&Drop ihr gewünschtes Feld aus, welches Sie kopieren möchten. \nTipp: Nutzen Sie hierfür die Tastenkürzel Strg + A, Strg + C, Strg + V. Nachdem Sie auf Kopieren gedrückt haben, können Sie mit dem Mauszeiger über das Raster wandern und das Feld an gewünschter Stelle mit einem Mausklick einfügen, oder vorher mithilfe des Mausrades rotieren. Sobald Sie fertig sind, drücken Sie auf \"Esc\" - Escape.");
         }
 
         private void BytegridChangeAction()

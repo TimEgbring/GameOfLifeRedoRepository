@@ -86,6 +86,8 @@
             this.menuItem12 = new System.Windows.Forms.MenuItem();
             this.menuItem8 = new System.Windows.Forms.MenuItem();
             this.Regeln_anpassen_menu_down = new System.Windows.Forms.MenuItem();
+            this.menuItem13 = new System.Windows.Forms.MenuItem();
+            this.label8 = new System.Windows.Forms.Label();
             this.PanelBottom.SuspendLayout();
             this.Information_groupBox.SuspendLayout();
             this.GroupBoxVersionChange.SuspendLayout();
@@ -118,6 +120,7 @@
             // PanelBottom
             // 
             this.PanelBottom.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.PanelBottom.Controls.Add(this.label8);
             this.PanelBottom.Controls.Add(this.Information_groupBox);
             this.PanelBottom.Controls.Add(this.Vorlagenname_label);
             this.PanelBottom.Controls.Add(this.ElapsedTime);
@@ -168,7 +171,7 @@
             // ElapsedTime
             // 
             this.ElapsedTime.AutoSize = true;
-            this.ElapsedTime.Location = new System.Drawing.Point(573, 51);
+            this.ElapsedTime.Location = new System.Drawing.Point(539, 121);
             this.ElapsedTime.Name = "ElapsedTime";
             this.ElapsedTime.Size = new System.Drawing.Size(35, 13);
             this.ElapsedTime.TabIndex = 14;
@@ -313,7 +316,6 @@
             this.label4.Size = new System.Drawing.Size(53, 13);
             this.label4.TabIndex = 21;
             this.label4.Text = "IncAbove";
-            this.label4.Visible = false;
             // 
             // label3
             // 
@@ -323,7 +325,6 @@
             this.label3.Size = new System.Drawing.Size(58, 13);
             this.label3.TabIndex = 20;
             this.label3.Text = "DecAbove";
-            this.label3.Visible = false;
             // 
             // label2
             // 
@@ -333,7 +334,6 @@
             this.label2.Size = new System.Drawing.Size(51, 13);
             this.label2.TabIndex = 19;
             this.label2.Text = "IncBelow";
-            this.label2.Visible = false;
             // 
             // label1
             // 
@@ -343,7 +343,6 @@
             this.label1.Size = new System.Drawing.Size(56, 13);
             this.label1.TabIndex = 18;
             this.label1.Text = "DecBelow";
-            this.label1.Visible = false;
             // 
             // DecBelow
             // 
@@ -510,8 +509,8 @@
             this.menuItem1,
             this.menuItem2,
             this.Vorlagen_menuItem,
-            this.menuItem5,
-            this.menuItem8});
+            this.menuItem8,
+            this.menuItem5});
             // 
             // menuItem1
             // 
@@ -586,10 +585,11 @@
             // 
             // menuItem5
             // 
-            this.menuItem5.Index = 3;
+            this.menuItem5.Index = 4;
             this.menuItem5.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
             this.menuItem6,
             this.menuItem7,
+            this.menuItem13,
             this.menuItem9,
             this.menuItem3,
             this.menuItem4,
@@ -608,41 +608,47 @@
             // menuItem7
             // 
             this.menuItem7.Index = 1;
-            this.menuItem7.Text = "Regeln";
+            this.menuItem7.Text = "Regeln Conway";
+            this.menuItem7.Click += new System.EventHandler(this.menuItem7_Click);
             // 
             // menuItem9
             // 
-            this.menuItem9.Index = 2;
-            this.menuItem9.Text = "Eigene Vorlagen speichern";
+            this.menuItem9.Index = 3;
+            this.menuItem9.Text = "Eigene Vorlagen speichern und laden";
+            this.menuItem9.Click += new System.EventHandler(this.menuItem9_Click);
             // 
             // menuItem3
             // 
-            this.menuItem3.Index = 3;
+            this.menuItem3.Index = 4;
             this.menuItem3.Text = "Wie manipuliere ich die Zellen?";
             // 
             // menuItem4
             // 
-            this.menuItem4.Index = 4;
+            this.menuItem4.Index = 5;
             this.menuItem4.Text = "Zustand zurücksetzen";
+            this.menuItem4.Click += new System.EventHandler(this.menuItem4_Click);
             // 
             // menuItem10
             // 
-            this.menuItem10.Index = 5;
-            this.menuItem10.Text = "Den Programmablauf schneller machen";
+            this.menuItem10.Index = 6;
+            this.menuItem10.Text = "Den Programmablauf verlangsamen";
+            this.menuItem10.Click += new System.EventHandler(this.menuItem10_Click);
             // 
             // menuItem11
             // 
-            this.menuItem11.Index = 6;
+            this.menuItem11.Index = 7;
             this.menuItem11.Text = "Über das Manipulieren von Regeln";
+            this.menuItem11.Click += new System.EventHandler(this.menuItem11_Click);
             // 
             // menuItem12
             // 
-            this.menuItem12.Index = 7;
+            this.menuItem12.Index = 8;
             this.menuItem12.Text = "Kopieren und Einfügen";
+            this.menuItem12.Click += new System.EventHandler(this.menuItem12_Click);
             // 
             // menuItem8
             // 
-            this.menuItem8.Index = 4;
+            this.menuItem8.Index = 3;
             this.menuItem8.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
             this.Regeln_anpassen_menu_down});
             this.menuItem8.Text = "Version";
@@ -652,6 +658,22 @@
             this.Regeln_anpassen_menu_down.Index = 0;
             this.Regeln_anpassen_menu_down.Text = "Regeln anpassen";
             this.Regeln_anpassen_menu_down.Click += new System.EventHandler(this.RegelnAnpassenMenu_Click);
+            // 
+            // menuItem13
+            // 
+            this.menuItem13.Index = 2;
+            this.menuItem13.Text = "Regeln eigene Version";
+            this.menuItem13.Click += new System.EventHandler(this.menuItem13_Click);
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(516, 103);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(89, 13);
+            this.label8.TabIndex = 17;
+            this.label8.Text = "Vergangene Zeit:";
+            this.label8.Visible = false;
             // 
             // Form1
             // 
@@ -744,6 +766,8 @@
         private System.Windows.Forms.Button Generatebuttonsizeofsymm;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.NumericUpDown SizeofSymmUpDown;
+        private System.Windows.Forms.MenuItem menuItem13;
+        private System.Windows.Forms.Label label8;
     }
 }
 
