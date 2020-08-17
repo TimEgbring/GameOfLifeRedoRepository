@@ -42,7 +42,7 @@ namespace GameOfLifeRedo
 
         Graphics g = null;
         
-
+        
         bool isrunning = false;
         bool gamehasstarted = false;
         bool[] isalive;
@@ -63,7 +63,8 @@ namespace GameOfLifeRedo
         
 
         static int cell_count_x, cell_count_y;
-        public int sizeofcell = 2;
+        int rangeofsymm;
+        public int sizeofcell;
         public struct GameState
         {
             public int generationcounter;
@@ -93,6 +94,7 @@ namespace GameOfLifeRedo
             int szh = Screen.PrimaryScreen.WorkingArea.Size.Height;
             
             this.Size = new Size(sz, szh);
+            rangeofsymm = (int) this.SizeofSymmUpDown.Value;
             sizeofcell = (int)this.SizeofcellupDown.Value;
             this.GenerationTimer.Interval = (int)MaxSpeed_numericUpDown.Value;
             this.SetStyle(ControlStyles.OptimizedDoubleBuffer| ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.SupportsTransparentBackColor, true);
@@ -1517,6 +1519,8 @@ namespace GameOfLifeRedo
         }
         private int GetFarNeighbor(int gnumber, int direction, int offset)
         {
+
+            
             if (offset == 0)
                 return gnumber;
             else
@@ -1629,6 +1633,18 @@ namespace GameOfLifeRedo
             ResetToNewSize();
         }
 
+        private void resetbuttonsizeofsymm_Click(object sender, EventArgs e)
+        {
+            rangeofsymm = (int)this.SizeofcellupDown.Value;
+            FullSymmetric_Button_Click(null, null);
+
+        }
+
+        private void SizeofcellupDown_ValueChanged(object sender, EventArgs e)
+        {
+
+        }
+
         private void BytegridChangeAction()
         {
             for (int i = 0; i < cell_count_x * cell_count_y; i++)
@@ -1666,9 +1682,9 @@ namespace GameOfLifeRedo
         
         private void GenerateFullSymmetric() //Implement parity difference (middle line or 2 middle lines?)
         {
-            byte range = 40;
+            
             Random rnd = new Random();
-            if (range*2 > cell_count_x || range*2 > cell_count_y)
+            if (rangeofsymm * 2 > cell_count_x || rangeofsymm * 2 > cell_count_y)
             {
                 MessageBox.Show("Range ist zu groß");
                 return;
@@ -1678,9 +1694,9 @@ namespace GameOfLifeRedo
                MessageBox.Show("True Symmetric ist verschoben");
 
             }
-            for (int i = 0; i < range; i++)
+            for (int i = 0; i < rangeofsymm; i++)
             {
-                for (int j = 0; j < range - i; j++)
+                for (int j = 0; j < rangeofsymm - i; j++)
                 {
 
                     
@@ -1691,13 +1707,13 @@ namespace GameOfLifeRedo
                         int point4 = point3 + 1;
 
 
-                        int n1 = point1 - (cell_count_x + 1) * range + cell_count_x * i + j + i + cell_count_x;
+                        int n1 = point1 - (cell_count_x + 1) * rangeofsymm + cell_count_x * i + j + i + cell_count_x;
                         int n12 = n1 + (cell_count_x - 1) * j;
-                        int n2 = point2 - (cell_count_x - 1) * range + cell_count_x * i - j - i - 2 + cell_count_x;
+                        int n2 = point2 - (cell_count_x - 1) * rangeofsymm + cell_count_x * i - j - i - 2 + cell_count_x;
                         int n22 = n2 + (cell_count_x + 1) * j;
-                        int n3 = point3 + (cell_count_x - 1) * range - cell_count_x * i + j + i - cell_count_x;
+                        int n3 = point3 + (cell_count_x - 1) * rangeofsymm - cell_count_x * i + j + i - cell_count_x;
                         int n32 = n3 - (cell_count_x + 1) * j;
-                        int n4 = point4 + (cell_count_x + 1) * range - cell_count_x * i - j - i - 2 - cell_count_x;
+                        int n4 = point4 + (cell_count_x + 1) * rangeofsymm - cell_count_x * i - j - i - 2 - cell_count_x;
                         int n42 = n4 - (cell_count_x - 1) * j;
                         switch (rnd.Next(0, 5))
                         {

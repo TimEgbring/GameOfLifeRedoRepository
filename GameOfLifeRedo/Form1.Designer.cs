@@ -37,6 +37,18 @@
             this.Vorlagenname_label = new System.Windows.Forms.Label();
             this.ElapsedTime = new System.Windows.Forms.Label();
             this.GroupBoxVersionChange = new System.Windows.Forms.GroupBox();
+            this.Generatebuttonsizeofsymm = new System.Windows.Forms.Button();
+            this.label7 = new System.Windows.Forms.Label();
+            this.SizeofSymmUpDown = new System.Windows.Forms.NumericUpDown();
+            this.ResetSizeBtn = new System.Windows.Forms.Button();
+            this.MaxSpeed_numericUpDown = new System.Windows.Forms.NumericUpDown();
+            this.label6 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.SizeofcellupDown = new System.Windows.Forms.NumericUpDown();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
             this.DecBelow = new System.Windows.Forms.NumericUpDown();
             this.DecAbove = new System.Windows.Forms.NumericUpDown();
             this.IncBelow = new System.Windows.Forms.NumericUpDown();
@@ -60,38 +72,30 @@
             this.Checkpunkt_MenuItem = new System.Windows.Forms.MenuItem();
             this.menuItem2 = new System.Windows.Forms.MenuItem();
             this.Auswählen_menuItem = new System.Windows.Forms.MenuItem();
+            this.Kopieren_MenuItem = new System.Windows.Forms.MenuItem();
             this.Einfügen_menuItem = new System.Windows.Forms.MenuItem();
             this.Vorlagen_menuItem = new System.Windows.Forms.MenuItem();
             this.menuItem5 = new System.Windows.Forms.MenuItem();
             this.menuItem6 = new System.Windows.Forms.MenuItem();
             this.menuItem7 = new System.Windows.Forms.MenuItem();
-            this.menuItem8 = new System.Windows.Forms.MenuItem();
-            this.Regeln_anpassen_menu_down = new System.Windows.Forms.MenuItem();
-            this.Kopieren_MenuItem = new System.Windows.Forms.MenuItem();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
-            this.SizeofcellupDown = new System.Windows.Forms.NumericUpDown();
-            this.label5 = new System.Windows.Forms.Label();
+            this.menuItem9 = new System.Windows.Forms.MenuItem();
             this.menuItem3 = new System.Windows.Forms.MenuItem();
             this.menuItem4 = new System.Windows.Forms.MenuItem();
-            this.menuItem9 = new System.Windows.Forms.MenuItem();
             this.menuItem10 = new System.Windows.Forms.MenuItem();
             this.menuItem11 = new System.Windows.Forms.MenuItem();
             this.menuItem12 = new System.Windows.Forms.MenuItem();
-            this.label6 = new System.Windows.Forms.Label();
-            this.MaxSpeed_numericUpDown = new System.Windows.Forms.NumericUpDown();
-            this.ResetSizeBtn = new System.Windows.Forms.Button();
+            this.menuItem8 = new System.Windows.Forms.MenuItem();
+            this.Regeln_anpassen_menu_down = new System.Windows.Forms.MenuItem();
             this.PanelBottom.SuspendLayout();
             this.Information_groupBox.SuspendLayout();
             this.GroupBoxVersionChange.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.SizeofSymmUpDown)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.MaxSpeed_numericUpDown)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.SizeofcellupDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.DecBelow)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.DecAbove)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.IncBelow)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.IncAbove)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.SizeofcellupDown)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.MaxSpeed_numericUpDown)).BeginInit();
             this.SuspendLayout();
             // 
             // GridColorFlowPanel
@@ -173,6 +177,9 @@
             // 
             // GroupBoxVersionChange
             // 
+            this.GroupBoxVersionChange.Controls.Add(this.Generatebuttonsizeofsymm);
+            this.GroupBoxVersionChange.Controls.Add(this.label7);
+            this.GroupBoxVersionChange.Controls.Add(this.SizeofSymmUpDown);
             this.GroupBoxVersionChange.Controls.Add(this.ResetSizeBtn);
             this.GroupBoxVersionChange.Controls.Add(this.MaxSpeed_numericUpDown);
             this.GroupBoxVersionChange.Controls.Add(this.label6);
@@ -187,13 +194,156 @@
             this.GroupBoxVersionChange.Controls.Add(this.IncBelow);
             this.GroupBoxVersionChange.Controls.Add(this.IncAbove);
             this.GroupBoxVersionChange.Controls.Add(this.button_fertig_regeln_anpassen);
-            this.GroupBoxVersionChange.Location = new System.Drawing.Point(1080, 5);
+            this.GroupBoxVersionChange.Location = new System.Drawing.Point(759, -1);
             this.GroupBoxVersionChange.Name = "GroupBoxVersionChange";
-            this.GroupBoxVersionChange.Size = new System.Drawing.Size(313, 126);
+            this.GroupBoxVersionChange.Size = new System.Drawing.Size(516, 126);
             this.GroupBoxVersionChange.TabIndex = 13;
             this.GroupBoxVersionChange.TabStop = false;
             this.GroupBoxVersionChange.Text = "Regeln anpassen";
             this.GroupBoxVersionChange.Visible = false;
+            // 
+            // Generatebuttonsizeofsymm
+            // 
+            this.Generatebuttonsizeofsymm.Location = new System.Drawing.Point(187, 94);
+            this.Generatebuttonsizeofsymm.Name = "Generatebuttonsizeofsymm";
+            this.Generatebuttonsizeofsymm.Size = new System.Drawing.Size(65, 23);
+            this.Generatebuttonsizeofsymm.TabIndex = 29;
+            this.Generatebuttonsizeofsymm.Text = "Generate";
+            this.Generatebuttonsizeofsymm.UseVisualStyleBackColor = true;
+            this.Generatebuttonsizeofsymm.Click += new System.EventHandler(this.resetbuttonsizeofsymm_Click);
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(145, 78);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(90, 13);
+            this.label7.TabIndex = 28;
+            this.label7.Text = "Size of Symmetric";
+            // 
+            // SizeofSymmUpDown
+            // 
+            this.SizeofSymmUpDown.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.25F);
+            this.SizeofSymmUpDown.Location = new System.Drawing.Point(145, 94);
+            this.SizeofSymmUpDown.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.SizeofSymmUpDown.Name = "SizeofSymmUpDown";
+            this.SizeofSymmUpDown.Size = new System.Drawing.Size(36, 23);
+            this.SizeofSymmUpDown.TabIndex = 27;
+            this.SizeofSymmUpDown.Value = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            // 
+            // ResetSizeBtn
+            // 
+            this.ResetSizeBtn.Location = new System.Drawing.Point(51, 94);
+            this.ResetSizeBtn.Name = "ResetSizeBtn";
+            this.ResetSizeBtn.Size = new System.Drawing.Size(55, 23);
+            this.ResetSizeBtn.TabIndex = 26;
+            this.ResetSizeBtn.Text = "Reset";
+            this.ResetSizeBtn.UseVisualStyleBackColor = true;
+            this.ResetSizeBtn.Click += new System.EventHandler(this.ResetSizeBtn_Click);
+            // 
+            // MaxSpeed_numericUpDown
+            // 
+            this.MaxSpeed_numericUpDown.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.25F);
+            this.MaxSpeed_numericUpDown.Location = new System.Drawing.Point(321, 94);
+            this.MaxSpeed_numericUpDown.Maximum = new decimal(new int[] {
+            2000,
+            0,
+            0,
+            0});
+            this.MaxSpeed_numericUpDown.Minimum = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this.MaxSpeed_numericUpDown.Name = "MaxSpeed_numericUpDown";
+            this.MaxSpeed_numericUpDown.Size = new System.Drawing.Size(36, 23);
+            this.MaxSpeed_numericUpDown.TabIndex = 25;
+            this.MaxSpeed_numericUpDown.Value = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this.MaxSpeed_numericUpDown.ValueChanged += new System.EventHandler(this.MaxSpeed_numericUpDown_ValueChanged);
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(297, 78);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(108, 13);
+            this.label6.TabIndex = 24;
+            this.label6.Text = "Max Speed (ms/Gen)";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(9, 78);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(61, 13);
+            this.label5.TabIndex = 23;
+            this.label5.Text = "Size Of Cell";
+            // 
+            // SizeofcellupDown
+            // 
+            this.SizeofcellupDown.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.25F);
+            this.SizeofcellupDown.Location = new System.Drawing.Point(9, 94);
+            this.SizeofcellupDown.Name = "SizeofcellupDown";
+            this.SizeofcellupDown.Size = new System.Drawing.Size(36, 23);
+            this.SizeofcellupDown.TabIndex = 22;
+            this.SizeofcellupDown.Value = new decimal(new int[] {
+            3,
+            0,
+            0,
+            0});
+            this.SizeofcellupDown.ValueChanged += new System.EventHandler(this.SizeofcellupDown_ValueChanged);
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(68, 25);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(53, 13);
+            this.label4.TabIndex = 21;
+            this.label4.Text = "IncAbove";
+            this.label4.Visible = false;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(252, 25);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(58, 13);
+            this.label3.TabIndex = 20;
+            this.label3.Text = "DecAbove";
+            this.label3.Visible = false;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(191, 25);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(51, 13);
+            this.label2.TabIndex = 19;
+            this.label2.Text = "IncBelow";
+            this.label2.Visible = false;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(6, 25);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(56, 13);
+            this.label1.TabIndex = 18;
+            this.label1.Text = "DecBelow";
+            this.label1.Visible = false;
             // 
             // DecBelow
             // 
@@ -253,9 +403,9 @@
             // 
             // button_fertig_regeln_anpassen
             // 
-            this.button_fertig_regeln_anpassen.Location = new System.Drawing.Point(213, 94);
+            this.button_fertig_regeln_anpassen.Location = new System.Drawing.Point(411, 84);
             this.button_fertig_regeln_anpassen.Name = "button_fertig_regeln_anpassen";
-            this.button_fertig_regeln_anpassen.Size = new System.Drawing.Size(75, 23);
+            this.button_fertig_regeln_anpassen.Size = new System.Drawing.Size(105, 42);
             this.button_fertig_regeln_anpassen.TabIndex = 13;
             this.button_fertig_regeln_anpassen.Text = "Fertig";
             this.button_fertig_regeln_anpassen.UseVisualStyleBackColor = true;
@@ -281,7 +431,7 @@
             // 
             // Rand_Button
             // 
-            this.Rand_Button.Location = new System.Drawing.Point(935, 78);
+            this.Rand_Button.Location = new System.Drawing.Point(614, 72);
             this.Rand_Button.Name = "Rand_Button";
             this.Rand_Button.Size = new System.Drawing.Size(117, 23);
             this.Rand_Button.TabIndex = 6;
@@ -310,7 +460,7 @@
             // 
             // ManualTick_Button
             // 
-            this.ManualTick_Button.Location = new System.Drawing.Point(935, 13);
+            this.ManualTick_Button.Location = new System.Drawing.Point(614, 7);
             this.ManualTick_Button.Name = "ManualTick_Button";
             this.ManualTick_Button.Size = new System.Drawing.Size(117, 23);
             this.ManualTick_Button.TabIndex = 3;
@@ -320,7 +470,7 @@
             // 
             // FullSymmetric_Button
             // 
-            this.FullSymmetric_Button.Location = new System.Drawing.Point(935, 46);
+            this.FullSymmetric_Button.Location = new System.Drawing.Point(614, 40);
             this.FullSymmetric_Button.Name = "FullSymmetric_Button";
             this.FullSymmetric_Button.Size = new System.Drawing.Size(117, 23);
             this.FullSymmetric_Button.TabIndex = 2;
@@ -413,6 +563,14 @@
             this.Auswählen_menuItem.Text = "Auswählen";
             this.Auswählen_menuItem.Click += new System.EventHandler(this.Kopieren_menuItem_Click);
             // 
+            // Kopieren_MenuItem
+            // 
+            this.Kopieren_MenuItem.Enabled = false;
+            this.Kopieren_MenuItem.Index = 1;
+            this.Kopieren_MenuItem.Shortcut = System.Windows.Forms.Shortcut.CtrlC;
+            this.Kopieren_MenuItem.Text = "Kopieren";
+            this.Kopieren_MenuItem.Click += new System.EventHandler(this.Kopieren_MenuItem_Click_1);
+            // 
             // Einfügen_menuItem
             // 
             this.Einfügen_menuItem.Enabled = false;
@@ -452,88 +610,10 @@
             this.menuItem7.Index = 1;
             this.menuItem7.Text = "Regeln";
             // 
-            // menuItem8
+            // menuItem9
             // 
-            this.menuItem8.Index = 4;
-            this.menuItem8.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
-            this.Regeln_anpassen_menu_down});
-            this.menuItem8.Text = "Version";
-            // 
-            // Regeln_anpassen_menu_down
-            // 
-            this.Regeln_anpassen_menu_down.Index = 0;
-            this.Regeln_anpassen_menu_down.Text = "Regeln anpassen";
-            this.Regeln_anpassen_menu_down.Click += new System.EventHandler(this.RegelnAnpassenMenu_Click);
-            // 
-            // Kopieren_MenuItem
-            // 
-            this.Kopieren_MenuItem.Enabled = false;
-            this.Kopieren_MenuItem.Index = 1;
-            this.Kopieren_MenuItem.Shortcut = System.Windows.Forms.Shortcut.CtrlC;
-            this.Kopieren_MenuItem.Text = "Kopieren";
-            this.Kopieren_MenuItem.Click += new System.EventHandler(this.Kopieren_MenuItem_Click_1);
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(6, 25);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(56, 13);
-            this.label1.TabIndex = 18;
-            this.label1.Text = "DecBelow";
-            this.label1.Visible = false;
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(191, 25);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(51, 13);
-            this.label2.TabIndex = 19;
-            this.label2.Text = "IncBelow";
-            this.label2.Visible = false;
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(252, 25);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(58, 13);
-            this.label3.TabIndex = 20;
-            this.label3.Text = "DecAbove";
-            this.label3.Visible = false;
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(68, 25);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(53, 13);
-            this.label4.TabIndex = 21;
-            this.label4.Text = "IncAbove";
-            this.label4.Visible = false;
-            // 
-            // SizeofcellupDown
-            // 
-            this.SizeofcellupDown.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.25F);
-            this.SizeofcellupDown.Location = new System.Drawing.Point(9, 94);
-            this.SizeofcellupDown.Name = "SizeofcellupDown";
-            this.SizeofcellupDown.Size = new System.Drawing.Size(36, 23);
-            this.SizeofcellupDown.TabIndex = 22;
-            this.SizeofcellupDown.Value = new decimal(new int[] {
-            5,
-            0,
-            0,
-            0});
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(9, 78);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(61, 13);
-            this.label5.TabIndex = 23;
-            this.label5.Text = "Size Of Cell";
+            this.menuItem9.Index = 2;
+            this.menuItem9.Text = "Eigene Vorlagen speichern";
             // 
             // menuItem3
             // 
@@ -544,11 +624,6 @@
             // 
             this.menuItem4.Index = 4;
             this.menuItem4.Text = "Zustand zurücksetzen";
-            // 
-            // menuItem9
-            // 
-            this.menuItem9.Index = 2;
-            this.menuItem9.Text = "Eigene Vorlagen speichern";
             // 
             // menuItem10
             // 
@@ -565,48 +640,18 @@
             this.menuItem12.Index = 7;
             this.menuItem12.Text = "Kopieren und Einfügen";
             // 
-            // label6
+            // menuItem8
             // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(122, 78);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(108, 13);
-            this.label6.TabIndex = 24;
-            this.label6.Text = "Max Speed (ms/Gen)";
+            this.menuItem8.Index = 4;
+            this.menuItem8.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.Regeln_anpassen_menu_down});
+            this.menuItem8.Text = "Version";
             // 
-            // MaxSpeed_numericUpDown
+            // Regeln_anpassen_menu_down
             // 
-            this.MaxSpeed_numericUpDown.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.25F);
-            this.MaxSpeed_numericUpDown.Location = new System.Drawing.Point(146, 94);
-            this.MaxSpeed_numericUpDown.Maximum = new decimal(new int[] {
-            2000,
-            0,
-            0,
-            0});
-            this.MaxSpeed_numericUpDown.Minimum = new decimal(new int[] {
-            10,
-            0,
-            0,
-            0});
-            this.MaxSpeed_numericUpDown.Name = "MaxSpeed_numericUpDown";
-            this.MaxSpeed_numericUpDown.Size = new System.Drawing.Size(36, 23);
-            this.MaxSpeed_numericUpDown.TabIndex = 25;
-            this.MaxSpeed_numericUpDown.Value = new decimal(new int[] {
-            10,
-            0,
-            0,
-            0});
-            this.MaxSpeed_numericUpDown.ValueChanged += new System.EventHandler(this.MaxSpeed_numericUpDown_ValueChanged);
-            // 
-            // ResetSizeBtn
-            // 
-            this.ResetSizeBtn.Location = new System.Drawing.Point(51, 94);
-            this.ResetSizeBtn.Name = "ResetSizeBtn";
-            this.ResetSizeBtn.Size = new System.Drawing.Size(55, 23);
-            this.ResetSizeBtn.TabIndex = 26;
-            this.ResetSizeBtn.Text = "Reset";
-            this.ResetSizeBtn.UseVisualStyleBackColor = true;
-            this.ResetSizeBtn.Click += new System.EventHandler(this.ResetSizeBtn_Click);
+            this.Regeln_anpassen_menu_down.Index = 0;
+            this.Regeln_anpassen_menu_down.Text = "Regeln anpassen";
+            this.Regeln_anpassen_menu_down.Click += new System.EventHandler(this.RegelnAnpassenMenu_Click);
             // 
             // Form1
             // 
@@ -630,12 +675,13 @@
             this.Information_groupBox.ResumeLayout(false);
             this.GroupBoxVersionChange.ResumeLayout(false);
             this.GroupBoxVersionChange.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.SizeofSymmUpDown)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.MaxSpeed_numericUpDown)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.SizeofcellupDown)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.DecBelow)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.DecAbove)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.IncBelow)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.IncAbove)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.SizeofcellupDown)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.MaxSpeed_numericUpDown)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -695,6 +741,9 @@
         private System.Windows.Forms.NumericUpDown MaxSpeed_numericUpDown;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Button ResetSizeBtn;
+        private System.Windows.Forms.Button Generatebuttonsizeofsymm;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.NumericUpDown SizeofSymmUpDown;
     }
 }
 
